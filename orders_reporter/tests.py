@@ -51,7 +51,7 @@ class TestConnection(unittest.TestCase):
     
     def setUp(self):
 
-        self.root_url = "http://127.0.0.1:8000"
+        self.root_url = "http://127.0.0.1:8000/inventory/"
         self.req = requests.get(self.root_url)
         self.list_urls = ['list/','graph/','manufacturer/1/','search/','myforms/','edit_manufacturer/1/']
     
@@ -80,7 +80,7 @@ class SeleniumTest(unittest.TestCase):
 
         self.driver = webdriver.Chrome()
 
-        self.driver.get("http://127.0.0.1:8000/")
+        self.driver.get("http://127.0.0.1:8000/inventory/")
 
         self.driver.find_element("id", "id_username").send_keys(username)
         self.driver.find_element("id","id_password").send_keys(password)

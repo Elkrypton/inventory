@@ -1,68 +1,156 @@
 <!DOCTYPE html>
-
 {% extends 'base.html' %}
 {% block header %}
 {% load bootstrap3 %}
+{% load static %}
 {% bootstrap_css %}
 <style>
-   table {
-    font-family: Arial, Helvetica, sans-serif;
-    width: 100%;
-    border-collapse: collapse;
- }
- th, th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
- }
- tr:nth-child(even) {
-    background-color: #dddddd;
- }
+  /* Global Styles */
   body {
-    height: 10vh;
-    background-color: white;
-    background-size: cover;
-    font-family: sans-serif;
+    background-color: #f9f9f9;
+    font-family: 'Segoe UI', sans-serif;
     margin-top: 20px;
     padding: 50px;
-}
-</style>
-<html lang="en">
-  <head>
-    <title>Product Details</title>
+  }
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-  </head>
-  {% endblock header %}
+  /* Heading Styles */
+  h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  /* Button Styling */
+  .btn-primary, .btn-danger {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 10px;
+    color: white;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+  }
+
+  /* Table Styling */
+  .table {
+    width: 100%;
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th, td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #495057;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  /* Card Styling for Product Details */
+  .product-details-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Image Styling */
+  .product-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  /* QR Code Styling */
+  .qr-code {
+    display: block;
+    max-width: 150px;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+</style>
+<title>Product Details</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+{% endblock header %}
+
 {% block content %}
 <body>
-    <h1>Product Details</h1>
-    <a href="{% url 'manufacturer_list' %}" class="btn btn-primary">Back to items List</a>
+  <h1>Product Details</h1>
+  <div class="actions-container">
+    <a href="{% url 'manufacturer_list' %}" class="btn btn-primary">Back to Items List</a>
     <a href="{% url 'manufacturer_pdf' pk=manufacturer.id %}?download=True" class="btn btn-primary">Download PDF</a>
     <a href="{% url 'edit' manufacturer.pk %}" class="btn btn-primary">Edit</a>
     <a href="{% url 'delete' manufacturer.pk %}" class="btn btn-danger">Delete</a>
-    <a href="{% url 'scan' %}" class="btn btn-primary">scan</a>
+    <a href="{% url 'scan' %}" class="btn btn-primary">Scan</a>
+  </div>
 
+  <div class="product-details-card mt-4">
+    <table class="table">
+      <tr>
+        <th>Description</th>
+        <th>Details</th>
+      </tr>
+      <tr>
+        <td>Item/Product</td>
+        <td>{{ manufacturer.item }}</td>
+      </tr>
+      <tr>
+        <td>Quantity</td>
+        <td>{{ manufacturer.quantity }}</td>
+      </tr>
+      <tr>
+        <td>Date of Production</td>
+        <td>{{ manufacturer.date_of_production }}</td>
+      </tr>
+      <tr>
+        <td>SKU</td>
+        <td>{{ manufacturer.sku }}</td>
+      </tr>
+      <tr>
+        <td>Location</td>
+        <td>{{ manufacturer.location }}</td>
+      </tr>
+      <tr>
+        <td>Image</td>
+        <td>
+          <img src="{% static 'images/manufacturer.product_img' %}" alt="Product Image" class="product-image">
+        </td>
+      </tr>
+    </table>
 
-    <br>
-    <br>
-
-      <div class="card-body" name="product_details">
-
-        <table class="table">
-          <tr>
-            <th>Description</th><th>Details</th>
-          </tr>
-        <tr><td>Item/Product</td><td>{{ manufacturer.item }}</td></tr>
-        <tr><td>Quantity</td><td>{{ manufacturer.quantity }}</td></tr>
-        <tr><td>Date of Production</td><td> {{ manufacturer.date_of_production }}</td></tr>
-        <tr><td>SKU</td><td>{{ manufacturer.sku }}</td></tr>
-        <tr><td>Location</td><td>{{ manufacturer.location }}</td></tr>
-
-        <br>
-        </table>
-        <img src="data:image/png;base64,{{ qr_code }}" />
-  </body>
+    <!-- QR Code Section -->
+    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="qr-code">
+  </div>
+</body>
 {% endblock content %}
-

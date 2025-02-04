@@ -1,10 +1,12 @@
 #loading db.models
 from django.db import models
-
+from django.contrib.auth.models import User
 
 class Manufacturer(models.Model):
     """Manufacturer model for products details"""
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.CharField(max_length=50)
+    product_img = models.ImageField(upload_to="images/")
     quantity = models.IntegerField()
     date_of_production = models.DateTimeField()
     sku = models.CharField(max_length=50, unique=True)
@@ -21,3 +23,12 @@ class Note(models.Model):
 class SearchProduct(models.Model):
     """Seach product model for retrieve information"""
     query = models.CharField(max_length=100)
+
+class Coach(models.Model):
+    coach_number = models.CharField(max_length=20)
+    departure_location = models.CharField(max_length=100)
+    arrival_location = models.CharField(max_length=100)
+    seat_capacity = models.IntegerField()
+
+    def __str__(self):
+        return self.coach_number

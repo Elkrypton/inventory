@@ -12,21 +12,59 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+import dotenv 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_ROOT = os.path.join(BASE_DIR, 'barcodes')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'barcodes', 'media')
+MEDIA_URL = '/media/'
+
+###Loading dotenv file
+
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
+
+
+
+LOGIN_REDIRECT_URL = 'manufacturer_list'
+LOGOUT_REDIRECT_URL = 'login'
+REGISTER_REDIRECT_URL = 'login'
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-DEBUG = False
+DEBUG = True
 #SECRET_KEY = 'django-insecure-#g7g_g)fi6$b7aa4kufn$#@_oowvmugn@o#-q5)wd4q0g2kg#m'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
                             'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag')
 # SECURITY WARNING: don't run with debug turned on in production!
 
 #DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
-ALLOWED_HOSTS = ['cryptoon.pythonanywhere.com', '127.0.0.1', "192.168.1.152"]
+ALLOWED_HOSTS = ['cryptoon.pythonanywhere.com', '127.0.0.1', "192.168.1.152", "192.168.1.166"]
+
+REST_FRAMEWORK  = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser'
+    ],
+}
+
+#EMAIL CONFIG
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+
+#auth model 
+
+
 
 
 # Application definition
@@ -36,12 +74,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'users.apps.UsersConfig',
     'django.contrib.staticfiles',
+    'interface',
+    'rest_framework',
     'bootstrap3',
     'bootstrap4',
     'orders_reporter',
     'crispy_forms',
-    'users',
 ]
 
 MIDDLEWARE = [
@@ -52,9 +92,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'orders_report.urls'
+
+STORAGES = {
+    'staticfiles': {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    }
+}
 
 TEMPLATES = [
     {
@@ -84,8 +132,14 @@ TEMPLATES = [
 
     #STATIC ASSET CONFIGURATIO
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = 'staticfiles'
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+# settings.py
+
+# Remove duplicate BASE_DIR definition (keep the one at the top)
+STATIC_URL = 'static/'  # <- Change from 'staticfiles/' to 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # For production (e.g., `collectstatic`)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Local development static files
+]
 
 WSGI_APPLICATION = 'orders_report.wsgi.application'
 
@@ -135,7 +189,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

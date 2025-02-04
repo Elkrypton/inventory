@@ -2,79 +2,169 @@
 {% extends 'base.html' %}
 {% block content %}
 <title>Inventory Stats</title>
-<canvas id="myChart"></canvas>
 
+<!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<canvas id="lineChart2"></canvas>
-<canvas id="lineChart"></canvas>
+<!-- Main Container -->
+<div class="container">
+  <h1 class="text-center my-5">Inventory Statistics</h1>
+
+  <!-- Charts -->
+  <div class="row justify-content-center">
+    <!-- Line Chart -->
+    <div class="col-md-6">
+      <canvas id="lineChart"></canvas>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="col-md-6">
+      <canvas id="lineChart2"></canvas>
+    </div>
+  </div>
+</div>
+
 <script>
-
-    document.addEventListener('DOMContentLoaded', function() {
-        var ctx = document.getElementById('lineChart').getContext('2d');
-        var items = {{ items|safe }};
-        var counts = {{ counts|safe }};
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: items,
-                datasets: [{
-                    label: 'Product Counts',
-                    data: counts,
-                    backgroundColor: 'rgba(106, 90, 205,1)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 0.5
-                }]
+  document.addEventListener('DOMContentLoaded', function() {
+    // Line Chart (Product Counts)
+    var ctx = document.getElementById('lineChart').getContext('2d');
+    var items = {{ items|safe }};
+    var counts = {{ counts|safe }};
+    var lineChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: items,
+        datasets: [{
+          label: 'Product Counts',
+          data: counts,
+          backgroundColor: 'rgba(106, 90, 205, 0.2)',  // Soft purple gradient
+          borderColor: 'rgba(106, 90, 205, 1)',     // Purple line
+          borderWidth: 2,
+          pointRadius: 5,
+          pointBackgroundColor: 'rgba(106, 90, 205, 1)',
+          tension: 0.4,  // Smooth line
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 5,
             },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-
-                layout: {
-            padding: {
-                left: 10,  // Adjust as needed
-                right: 10, // Adjust as needed
-                top: 10,   // Adjust as needed
-                bottom: 10 // Adjust as needed
+            grid: {
+              borderColor: '#ddd',
             }
-            },
-            scales: {
-            x: {
-                barPercentage: 0.2, // Adjust the width of the bars
-                categoryPercentage: 0.6 // Adjust the space between bars
+          },
+          x: {
+            grid: {
+              borderColor: '#ddd',
             }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              font: {
+                size: 14,
+                family: "'Poppins', sans-serif"
+              }
+            }
+          },
         }
-    }});
+      }
+    });
 
-        var crt = document.getElementById('lineChart2').getContext('2d');
-        var products = {{ products|safe }};
-        var quantities = {{ quantities|safe }};
-        var myChart = new Chart(crt, {
-            type: 'bar',
-            data: {
-                labels: products,
-                datasets: [{
-                    label: 'Products Quantities',
-                    data: quantities,
-                    fill: false,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
+    // Bar Chart (Product Quantities)
+    var crt = document.getElementById('lineChart2').getContext('2d');
+    var products = {{ products|safe }};
+    var quantities = {{ quantities|safe }};
+    var barChart = new Chart(crt, {
+      type: 'bar',
+      data: {
+        labels: products,
+        datasets: [{
+          label: 'Product Quantities',
+          data: quantities,
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',  // Light teal bars
+          borderColor: 'rgba(75, 192, 192, 1)',      // Teal border
+          borderWidth: 1,
+          hoverBackgroundColor: 'rgba(75, 192, 192, 0.4)',
+          hoverBorderColor: 'rgba(75, 192, 192, 1)',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 5,
             },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+            grid: {
+              borderColor: '#ddd',
             }
-        });
-    })
-    ;
+          },
+          x: {
+            grid: {
+              borderColor: '#ddd',
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              font: {
+                size: 14,
+                family: "'Poppins', sans-serif"
+              }
+            }
+          },
+        }
+      }
+    });
+  });
 </script>
+
+<!-- Styling for Better Design -->
+<style>
+  body {
+    background-color: #f7fafc;
+    font-family: 'Poppins', sans-serif;
+    padding: 50px 0;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .row {
+    margin-top: 30px;
+  }
+
+  .col-md-6 {
+    margin-bottom: 30px;
+  }
+
+  canvas {
+    max-width: 100%;
+    height: 400px;  /* Set a fixed height for better layout */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+</style>
 
 {% endblock content %}

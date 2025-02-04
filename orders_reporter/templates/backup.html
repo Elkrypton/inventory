@@ -1,0 +1,162 @@
+{% csrf_token %}
+<!DOCTYPE html>
+{% load bootstrap3 %}
+<html lang="en">
+<head>
+{% bootstrap_css %}
+  <style>
+
+  header img {
+    height: 80px;
+    margin-left: 40px;
+}
+body {
+    height: 125vh;
+    background-color: white;
+    background-size: cover;
+    font-family: sans-serif;
+    margin-top: 80px;
+    padding: 30px;
+}
+
+main {
+    color: white;
+}
+
+header {
+    background-color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 0 25px 0 black;
+}
+
+header * {
+    display: inline;
+}
+
+header li {
+    margin: 20px;
+}
+
+header li a {
+    color: black;
+    text-decoration: yes;
+}
+</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+</head>
+<header>
+  <img src="https://cdn-icons-png.flaticon.com/512/6366/6366235.png">
+   <nav>
+       <ul>
+           <li><a class="active" href="{% url 'home' %}">Inventory Managment</a></li>
+           <li><a href="{% url 'myforms' %}">Add product</a></li>
+           <li><a href="{% url 'manufacturer_list' %}">View Items</a></li>
+           <li><a href="{% url 'graph' %}">Inventory Stats</a></li>
+           <li><a href="{% url 'search' %}">Search</a></li>
+
+           <li><a href="{% url 'feedback' %}">Feedback</a></li>
+
+           {% if user.is_authenticated %}
+           <li><a href="{% url 'logout' %}">Logout</a></li>{% csrf_token %}
+           <!DOCTYPE html>
+           {% load bootstrap3 %}
+           <html lang="en">
+           <head>
+             <meta charset="UTF-8">
+             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+             <title>{% block title %}{% endblock %}</title>
+             {% bootstrap_css %}
+             <style>
+               body {
+                 background-color: #f8f8f8;
+                 font-family: sans-serif;
+               }
+           
+               header {
+                 background-color: #ffffff;
+                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+               }
+           
+               header img {
+                 height: 60px;
+                 margin-left: 20px;
+               }
+           
+               nav ul {
+                 list-style: none;
+                 display: flex;
+                 align-items: center;
+               }
+           
+               nav li {
+                 margin: 0 10px;
+               }
+           
+               nav a {
+                 text-decoration: none;
+                 color: #333333;
+                 font-weight: bold;
+               }
+           
+               nav a.active {
+                 color: #1974D2;
+               }
+           
+               .container {
+                 margin-top: 100px;
+                 padding: 30px;
+               }
+           
+               main {
+                 color: #ffffff;
+               }
+             </style>
+           </head>
+           <body>
+             <header>
+               <img src="https://cdn-icons-png.flaticon.com/512/6366/6366235.png">
+               <nav>
+                 <ul>
+                   <li><a class="active" href="{% url 'home' %}">Inventory Management</a></li>
+                   <li><a href="{% url 'myforms' %}">Add Product</a></li>
+                   <li><a href="{% url 'manufacturer_list' %}">View Items</a></li>
+                   <li><a href="{% url 'graph' %}">Inventory Stats</a></li>
+                   <li><a href="{% url 'search' %}">Search</a></li>
+                   <li><a href="{% url 'feedback' %}">Feedback</a></li>
+                   {% if user.is_authenticated %}
+                     <li><a href="{% url 'logout' %}">Logout</a></li>
+                   {% else %}
+                     <li><a href="{% url 'login' %}">Login</a></li>
+                   {% endif %}
+                 </ul>
+               </nav>
+             </header>
+             <div class="container">
+               {% block content %}
+               {% endblock %}
+             </div>
+           </body>
+           </html>
+           
+           {% else %}
+           <li><a href="{% url 'login' %}">Login</a><li>
+           {% endif %}
+       </ul>
+   </nav>
+</header>
+  <div class="container">
+    {% block content %}
+
+    {% endblock %}
+  </div>
+
+</body>
+ 

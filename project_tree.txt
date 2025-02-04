@@ -1,0 +1,73 @@
+.
+├── LICENSE
+├── Procfile
+├── README.md
+├── db.sqlite3
+├── manage.py
+├── orders_report
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── settings.py~
+│   ├── urls.py
+│   └── wsgi.py
+├── orders_reporter
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── migrations
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_manufacturer_date_added.py
+│   │   ├── 0003_alter_manufacturer_model_alter_manufacturer_name_and_more.py
+│   │   ├── 0004_rename_name_manufacturer_vendor.py
+│   │   ├── 0005_manufacturer_location.py
+│   │   ├── 0006_alter_manufacturer_date_added.py
+│   │   ├── 0007_submittedreport.py
+│   │   ├── 0008_auto_20230429_1504.py
+│   │   ├── 0009_alter_manufacturer_order_date.py
+│   │   ├── 0010_note.py
+│   │   ├── 0011_rename_note_note_feedback.py
+│   │   ├── 0012_auto_20230804_1844.py
+│   │   ├── 0013_auto_20230804_2309.py
+│   │   ├── 0014_auto_20230930_2314.py
+│   │   ├── 0015_manufacturer_description.py
+│   │   ├── 0016_remove_manufacturer_description.py
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── modules.py
+│   ├── templates
+│   │   ├── base.html
+│   │   ├── forms.html
+│   │   ├── forms.html~
+│   │   ├── graph.html
+│   │   ├── home.html
+│   │   ├── manufacturer_detail.html
+│   │   ├── manufacturer_edit.html
+│   │   ├── manufacturer_list.html
+│   │   ├── manufacturer_list_backup.html
+│   │   ├── note.html
+│   │   ├── submitted.html
+│   │   ├── submitted_list.html
+│   │   └── submitted_report.html
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── project_tree.txt
+├── requirements.txt
+└── users
+    ├── __init__.py
+    ├── admin.py
+    ├── apps.py
+    ├── forms.py
+    ├── migrations
+    │   └── __init__.py
+    ├── models.py
+    ├── templates
+    │   ├── Register.html
+    │   └── login.html
+    ├── tests.py
+    ├── urls.py
+    └── views.py
+
+8 directories, 63 files

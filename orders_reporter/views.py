@@ -1,11 +1,42 @@
 from .modules import *
+from .models import Manufacturer
+from rest_framework import generics, viewsets
+from .serializers import *
 
+
+import traceback
+
+    
+from django.shortcuts import render
+from django.shortcuts import redirect
+from django.shortcuts import HttpResponseRedirect, reverse, HttpResponse
+from django.contrib.auth.decorators import login_required
+import qrcode
+from .forms import SearchForm
+from io import BytesIO
+import base64
+from django.template.loader import get_template
+from django.views import View
+import xhtml2pdf.pisa as pisa
+from .forms import ManufacturerForm
+from .models import Manufacturer
+from .forms import NoteForm
+from django.shortcuts import render, get_object_or_404
+from .models import Manufacturer
+import matplotlib.pyplot as plt
+from collections import Counter
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
+
+
+@login_required
 class TotalNumoProducts():
     """Total number of products"""
 
-    def __init__(self):
+    def __init__(self, request):
         """Initialize the class."""
-        self.manufacturer = Manufacturer.objects.all().values()
+        self.manufacturer = Manufacturer.objects.filter(owner=request.user).values()
 
     def total_number_of_products(self):
         """Calculate the total number of each product."""
@@ -16,7 +47,7 @@ class TotalNumoProducts():
         """Return a string representation of the class."""
         return "Class includes all products counts and quantity for each"
 
-
+@method_decorator(login_required, name='dispatch')
 class GeneratePDF(View):
     """Class to generate PDF from web page"""
 
@@ -37,19 +68,19 @@ class GeneratePDF(View):
             return response
         return HttpResponse("Not Found")
 
-
+@login_required
 def qrcode_scanner(request):
     """Handle requests for QR code scanning."""
     return render(request, 'qrcode.html')
 
-
+@login_required
 def product_search(request):
     """Handle product search."""
     if request.method == 'GET':
         form = SearchForm(request.GET)
         if form.is_valid():
             query = form.cleaned_data.get('query')
-            results = Manufacturer.objects.filter(item=query) | Manufacturer.objects.filter(sku=query)
+            results = Manufacturer.objects.filter(item=query, owner=request.user) | Manufacturer.objects.filter(sku=query, owner=request.user)
         else:
             results = []
     else:
@@ -58,9 +89,10 @@ def product_search(request):
     return render(request, 'search.html', {'form': form, 'results': results})
 
 
+@login_required
 def GraphView(request):
     """Handle rendering of a graph view."""
-    total_products = TotalNumoProducts()
+    total_products = TotalNumoProducts(request)
     item_counts = total_products.total_number_of_products()
     manufacturer = total_products.manufacturer
     products = [values['item'] for values in manufacturer]
@@ -72,7 +104,7 @@ def GraphView(request):
                'quantities': quantities}
     return render(request, 'graph.html', context)
 
-
+@login_required
 def feedback(request):
     """Handle feedback submission."""
     if request.method == 'POST':
@@ -107,10 +139,13 @@ def generate_qr_code(data):
     return base64.b64encode(buffer.getvalue()).decode()
 
 
-@permission_required('manufacturer_edit', raise_exception=True)
+@login_required
 def manufacturer_edit(request, pk):
     """Handle editing a manufacturer."""
-    manufacturer = Manufacturer.objects.get(pk=pk)
+    manufacturer = Manufacturer.objects.filter(owner=request.user)
+    if manufacturer.owner != request.user:
+        return HttpResponse("You do not have the persmission to edit this, please login.")
+    
     if request.method != 'POST':
         form = ManufacturerForm(instance=manufacturer)
     else:
@@ -127,7 +162,7 @@ def index(request):
     """Handle the main index page."""
     return render(request, 'home.html')
 
-
+@login_required
 def render_to_pdf(template_src, context_dict={}):
     """Render a template to a PDF."""
     template = get_template(template_src)
@@ -138,20 +173,19 @@ def render_to_pdf(template_src, context_dict={}):
         return HttpResponse(result.getvalue(), content_type='application/pdf')
     return None
 
-
 @login_required
-@permission_required('my_form_view', raise_exception=True)
 def my_form_view(request):
     """Handle the form view."""
     if request.method == 'POST':
-        form = ManufacturerForm(request.POST)
+        form = ManufacturerForm(request.POST, request.FILES)
         if form.is_valid():
             print(">> THE FORM IS VALID")
-            new_manufacturer = form.save(commit=False)
+            item = form.save(commit=False)
             # add some extra fields or do some operations
-            new_manufacturer.owner = request.user
-            new_manufacturer.save()
+            item.owner = request.user
+            item.save()
             return HttpResponseRedirect(reverse('manufacturer_list'))
+        
         else:
             print("!!!! THE FORM ISN'T VALID!")
     else:
@@ -167,24 +201,62 @@ def success_page(request):
 @login_required
 def manufacturer_list(request):
     """Handle listing manufacturers."""
-    manufacturers = Manufacturer.objects.all()
+    manufacturers = Manufacturer.objects.filter(owner=request.user)
     return render(request, 'manufacturer_list.html',
                   {'manufacturers': manufacturers})
 
-
-@permission_required('delete_manufacturer', raise_exception=True)
+@login_required
 def delete_manufacturer(request, pk):
     """Handle deleting a manufacturer."""
-    manufacturer = Manufacturer.objects.get(pk=pk)
+    manufacturer = get_object_or_404(Manufacturer, pk=pk)
+    if manufacturer.owner != request.user:
+        return HttpResponse("You don't have permission to delete this")
     manufacturer.delete()
     return redirect(reverse('manufacturer_list'))
 
+@login_required
+def PurchaseInterface(request):
+    return render(request,  'PurchaseInterface.html')
+
+@login_required
+def Purchase(request, product, quantity):
+    selected_product = Manufacturer.objects.get(item=product)
+    selected_product.quantity -= quantity
+    selected_product.save()
 
 @login_required
 def manufacturer_detail(request, pk):
     """Handle displaying manufacturer details."""
     manufacturer = get_object_or_404(Manufacturer, pk=pk)
+    if manufacturer.owner != request.user:
+        return HttpResponse("You don't have the permission to view this")
+
+    file_path = manufacturer.product_img
     qr_codes = generate_qr_code("http://127.0.0.1:8000/manufacturer/{}".format(pk))
     return render(request, "manufacturer_detail.html",
                   {"manufacturer": manufacturer,
-                   "qr_code": qr_codes})
+                   "qr_code": qr_codes,
+                   "file_path": file_path})
+
+
+####API SECTION
+@login_required
+class ManufacturerViewSet(viewsets.ModelViewSet):
+    """API endpoint for managing manufacturers."""
+    queryset = Manufacturer.objects.all().order_by('item')
+    serializer_class = ManufacturerSerializer
+
+
+@login_required
+class NoteViewSet(viewsets.ModelViewSet):
+    """API endpoint for managing notes."""
+    queryset = Note.objects.all().order_by('name')
+    serializer_class = FeedbackSerializer
+
+@login_required
+class SearchViewSet(viewsets.ModelViewSet):
+    """API endpoint for searching manufacturers."""
+    queryset = SearchProduct.objects.all()
+    serializer_class = SearchSerializer
+
+

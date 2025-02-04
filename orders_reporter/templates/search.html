@@ -1,101 +1,186 @@
 <!DOCTYPE html>
-
 {% extends 'base.html' %}
 {% block content %}
 {% load bootstrap3 %}
 <title>Search</title>
 
 <head>
-  <meta aria-expanded="false">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
+</head>
 
-    </head>
-    <style>
-        body {
-    font-family: Arial, sans-serif;
+<style>
+  /* Global reset for the page */
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f7fc;
+    margin: 0;
+    padding: 0;
     display: flex;
-    justify-content: left;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Container styles for the content */
+  .container-search {
+    background: white;
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 150%;
+    max-width: 900px;
+    margin-top: 30px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+  }
+
+  /* Form styles */
+  form {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    height: 30vh; /* This ensures the content is centered vertically on the page */
-}
+    gap: 20px;
+  }
 
-form {
-    text-align: center; /* Center the form contents */
-}
+  input[type="text"] {
+    width: 80%;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    outline: none;
+  }
 
-        input[type=text], select, textarea {
-            width: 60%;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            resize: horizontal;
-          }
+  input[type="text"]:focus {
+    border-color: #1974D2;
+  }
 
+  .button1 {
+    padding: 12px 30px;
+    background-color: #1974D2;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
 
-      .button1 {
-        display: inline-block;
-        padding: 10px 20px;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
-        text-decoration: none;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
+  .button1:hover {
+    background-color: #155a8a;
+    transform: scale(1.05);
+  }
 
-      .button1[type="submit"]:hover {
-        background-color: #1974D2;
-        color: #ffffff;
-      }
-      .button1 {border-radius: 2px;}
-      table{
-        font-family: Arial, Helvetica, sans-serif;
-        width: 100%;
-        border-collapse: collapse;
-     }
-     th, th {
-        border: 1px solid #dddddd;
-        text-align: left;
-        padding: 8px;
-     }
-     tr:nth-child(even) {
-        background-color: #dddddd;
-     }
-      </style>
-    <body>
+  /* Table styling */
+  .table-container {
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th, td {
+    padding: 14px;
+    text-align: left;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  th {
+    background-color: #f1f1f1;
+    font-weight: 600;
+    color: #444;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  tr:hover {
+    background-color: #e6f3ff;
+    cursor: pointer;
+  }
+
+  .no-results {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .container {
+      padding: 20px;
+    }
+
+    input[type="text"] {
+      width: 90%;
+    }
+
+    .button1 {
+      width: 100%;
+    }
+
+    table {
+      font-size: 14px;
+    }
+  }
+
+</style>
+
+<body>
+  <div class="container-search">
+    <h1>Search for Products</h1>
     <form method="get">
-      <div class="container">
-        <form method="get">
-            <input type="text" name="query" maxlength="100" placeholder="sku or product name",value="this is a test">
-              {% csrf_token %}
-      <button type="submit" id="id_search" class="button button1">Search</button>
-</div>
-</form>
-    </body>
+      <input type="text" name="query" maxlength="100" placeholder="Search by SKU or Product Name" value="{{ request.GET.query }}">
+      {% csrf_token %}
+      <button type="submit" id="id_search" class="button1">Search</button>
+    </form>
 
-{% if results %}
-<br>
-<div id="id_results">
-    <h4>Search Results:</h4>
-<br>
-<table>
-   <tr>
-               <th>Item</th>
-               <th>Date Created</th>
-               <th>Location</th>
-   </tr>
-
-    {% for manufacturer in results %}
-    <td><a href="{% url 'manufacturer_detail' manufacturer.pk %}">{{ manufacturer.item }}</a></td>
-    <td>{{ manufacturer.date_added|date:'M d,Y H:i' }}</td>
-    <td>{{ manufacturer.location }}</td>
-    </tr>
-    {% empty %}
-    <h2>Nothing Found</2>
+    {% if results %}
+    <div class="table-container">
+      <h4>Search Results:</h4>
+      <table>
+        <tr>
+          <th>Item</th>
+          <th>Date Created</th>
+          <th>Location</th>
+        </tr>
+        {% for manufacturer in results %}
+        <tr>
+          <td><a href="{% url 'manufacturer_detail' manufacturer.pk %}">{{ manufacturer.item }}</a></td>
+          <td>{{ manufacturer.date_added|date:'M d,Y H:i' }}</td>
+          <td>{{ manufacturer.location }}</td>
+        </tr>
+        {% endfor %}
+      </table>
     </div>
-{% endfor %}
-
+    {% else %}
+    <p class="no-results">No results found. Please try another search.</p>
+    {% endif %}
+  </div>
 </body>
-{% endif %}
+
 {% endblock content %}

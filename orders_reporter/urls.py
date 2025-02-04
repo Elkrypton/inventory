@@ -1,10 +1,25 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from rest_framework import routers
 from .views import *
 
+
+router = routers.DefaultRouter()
+router.register(r'manufacturer_api', ManufacturerViewSet, basename="manufacturer_api")
+router.register(r'note_api', NoteViewSet, basename="feedback_api")
+router.register(r'search_api', SearchViewSet, basename="search_api")
+
+
+
 urlpatterns = [
+            
+        ###
+
+
+    ### Application front end routers
+    path('', index, name='home'),
     path('', index, name='home'),
     path('graph/', GraphView,name='graph'),
     path('myforms/', my_form_view, name='myforms'),
@@ -16,4 +31,13 @@ urlpatterns = [
     path('search/',product_search, name="search"),
     path('feedback/',feedback, name="feedback"),
     path('submitted/', success_page, name="success_page"),
-    path('edit_manufacturer/<int:pk>/', manufacturer_edit,name="edit")]
+    path('edit_manufacturer/<int:pk>/', manufacturer_edit,name="edit")
+    ]
+
+
+
+if settings.DEBUG:
+    
+        urlpatterns += static(settings.MEDIA_URL,
+                              document_root=settings.MEDIA_ROOT)
+        

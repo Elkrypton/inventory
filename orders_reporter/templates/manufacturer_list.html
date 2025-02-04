@@ -1,53 +1,80 @@
 <!DOCTYPE html>
-
 {% extends "base.html" %}
 {% load bootstrap3 %}
 {% block content %}
 {% block header %}
 <title>Products List</title>
+<meta charset="utf-8">
+{% endblock header %}
 
-      <meta charset="utf-8">
-  {% endblock header %}
+<style>
+  /* Container for product cards */
+  .products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 40px;
+  }
 
- <style>
-   table {
-      font-family: Arial, Helvetica, sans-serif;
-      width: 100%;
-      border-collapse: collapse;
-      border-radius: 6px; /* Slightly rounded edges */
-      overflow: hidden; /* Hide overflowing content */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    th, td {
-      border: 1px solid #dddddd;
-      text-align: left;
-      padding: 12px; /* More padding */
-    }
-    
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    
+  /* Individual product card styling */
+  .product-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    overflow: hidden;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .product-content {
+    padding: 30px;
+  }
+
+  /* Card title (Item name) */
+  .product-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+  }
+
+  .product-title:hover {
+    color: #007bff;
+  }
+
+  /* Additional product details */
+  .product-details {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 8px;
+  }
+
+  /* Empty state message styling */
+  .empty-message {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #666;
+    margin-top: 40px;
+  }
 </style>
 
-<table>
-   <tr>
-               <th>Item</th>
-               <th>Date Created</th>
-               <th>Location</th>
-   </tr>
-               <tr>
-{% for manufacturer in manufacturers %}
-                <td><a name="manufacturer" href="{% url 'manufacturer_detail' manufacturer.pk %}">{{ manufacturer.item }}</a></td>
-                <td>{{ manufacturer.date_added|date:'M d,Y H:i' }}</td>
-                <td>{{ manufacturer.location }}</td>
-                </tr>
-                {% empty %}
+<div class="products-container">
+  {% for manufacturer in manufacturers %}
+  <div class="product-card">
+    <div class="product-content">
+      <a class="product-title" href="{% url 'manufacturer_detail' manufacturer.pk %}">{{ manufacturer.item }}</a>
+      <p class="product-details">Created: {{ manufacturer.date_added|date:'M d, Y H:i' }}</p>
+      <p class="product-details">Location: {{ manufacturer.location }}</p>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-message">
+    <h2>The list is empty, create a new item/product!</h2>
+  </div>
+  {% endfor %}
+</div>
 
-                <h2>The list is empty, create a new item/product</2>
-
-{% endfor %}
 {% endblock content %}
-
-

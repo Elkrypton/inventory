@@ -13,9 +13,8 @@ try:
     from django.template.loader import get_template
     from django.views import View
     import xhtml2pdf.pisa as pisa
-    from .forms import ManufacturerForm
+    from .forms import ManufacturerForm, NoteForm, CoachForm
     from .models import Manufacturer
-    from .forms import NoteForm
     from django.shortcuts import render, get_object_or_404
     from .models import Manufacturer
     import matplotlib.pyplot as plt

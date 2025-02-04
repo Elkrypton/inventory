@@ -1,0 +1,8 @@
+{
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "yes",
+    "python.analysis.typeCheckingMode": "off",
+    "codetogether.virtualCursorJoin": "sharedVirtualCursor"
+}

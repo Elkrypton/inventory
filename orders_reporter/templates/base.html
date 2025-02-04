@@ -1,81 +1,157 @@
-<!DOCTYPE html>
-
+ "<!DOCTYPE html>
 {% csrf_token %}
 {% load bootstrap3 %}
 <html lang="en">
 <head>
-{% bootstrap_css %}
-  <style>
+    {% bootstrap_css %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <style>
+        /* Reset and Base Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin-top: 30px;
+            padding: 0;
+        }
 
-  header img {
-    height: 80px;
-    margin-left: 40px;
-}
-body {
-    height: 125vh;
-    background-color: white;
-    background-size: cover;
-    font-family: sans-serif;
-    margin-top: 80px;
-    padding: 30px;
-}
+        /* Header Styling */
+        header {
+            background-color: #ffffff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
 
-main {
-    color: white;
-}
+        header img {
+            height: 50px;
+        }
 
-header {
-    background-color: white;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 0 25px 0 black;
-}
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
 
-header * {
-    display: inline;
-}
+        nav li {
+            display: inline-block;
+        }
 
-header li {
-    margin: 20px;
-}
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-size: 1.9rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease-in-out;
+        }
 
-header li a {
-    color: black;
-    text-decoration: none;
-}
-</style>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        nav a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Button Styling for Auth */
+        .auth-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .auth-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Main Content Styling */
+        .container-main {
+            margin-top: 100px;
+            padding: 30px;
+        }
+
+        /* Responsive Navigation */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                background-color: white;
+                position: absolute;
+                top: 80px;
+                left: 0;
+                right: 0;
+                display: none;
+                z-index: 100;
+            }
+
+            nav ul.active {
+                display: block;
+            }
+
+            .menu-icon {
+                cursor: pointer;
+                display: block;
+            }
+
+            nav a {
+                font-size: 1.6rem;
+            }
+
+            header {
+                padding: 0 20px;
+            }
+        }
+    </style>
 </head>
+<body>
 <header>
-  <img src="https://cdn-icons-png.flaticon.com/512/6366/6366235.png">
-   <nav>
-       <ul>
-           <li><a class="active" href="{% url 'home' %}">Inventory Managment</a></li>
-           <li><a id="id_form" href="{% url 'myforms' %}">Add product</a></li>
-           <li><a name="items_list"  href="{% url 'manufacturer_list' %}">View Items</a></li>
-           <li><a id="id_stats" href="{% url 'graph' %}">Inventory Stats</a></li>
-           <li><a id ="id_search" href="{% url 'search' %}">Search</a></li>
+    <img src="https://cdn-icons-png.flaticon.com/512/6366/6366235.png" alt="Logo">
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Inventory Management</a></li>
+            <li><a id="id_form" href="{% url 'myforms' %}">Add Product</a></li>
+            <li><a name="items_list" href="{% url 'manufacturer_list' %}">View Items</a></li>
+            <li><a id="id_stats" href="{% url 'graph' %}">Inventory Stats</a></li>
+            <li><a id="id_search" href="{% url 'search' %}">Search</a></li>
+            <li><a href="{% url 'feedback' %}">Feedback</a></li>
 
-           <li><a href="{% url 'feedback' %}">Feedback</a></li>
-
-           {% if user.is_authenticated %}
-           <li><a href="{% url 'logout' %}">Logout</a></li>
-           {% else %}
-           <li><a href="{% url 'login' %}">Login</a><li>
-           {% endif %}
-       </ul>
-   </nav>
+            {% if user.is_authenticated %}
+            <li><a class="auth-btn" href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+            <li><a class="auth-btn" href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 </header>
-  <div class="container">
+<div class="container-main">
     {% block content %}
-
     {% endblock %}
-  </div>
+</div>
 
+<script>
+    // Toggle Menu for Mobile View
+    const menuIcon = document.querySelector('.menu-icon');
+    const navMenu = document.querySelector('nav ul');
+
+    menuIcon.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+    });
+</script>
 </body>
+</html>
