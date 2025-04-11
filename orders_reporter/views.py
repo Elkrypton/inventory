@@ -3,10 +3,10 @@ from .models import Manufacturer
 from rest_framework import generics, viewsets
 from .serializers import *
 
-
+import barcode
 import traceback
 
-    
+import io
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import HttpResponseRedirect, reverse, HttpResponse
@@ -27,8 +27,25 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from barcode.writer import ImageWriter
+from barcode import Code39
 
+# def generate_qr_code(sku):
+#     code_obj = Code39(sku, writer=ImageWriter())
+#     buffer = io.BytesIO()
+#     code_obj.write(buffer)
+#     buffer.seek(0)
+#     barcode_obj, created = GeneratedBarcode.objects.get_or_create(code=sku)
+    
+#     if created:
+#         barcode_obj.image.save(f'{code}.png', buffer, save=True)
+#         action_performed = "created"
+#     else:
+#         action_performed = "fetched"
 
+#     myResponse = f'Barcode "{code}" {action_performed} successfully! <a href="{barcode_obj.image.url}">IMAGE LINK</a>'
+    
+#     return HttpResponse(myResponse)
 
 @login_required
 class TotalNumoProducts():
@@ -142,10 +159,8 @@ def generate_qr_code(data):
 @login_required
 def manufacturer_edit(request, pk):
     """Handle editing a manufacturer."""
-    manufacturer = Manufacturer.objects.filter(owner=request.user)
-    if manufacturer.owner != request.user:
-        return HttpResponse("You do not have the persmission to edit this, please login.")
-    
+
+    manufacturer = Manufacturer.objects.get(owner=request.user, pk=pk)
     if request.method != 'POST':
         form = ManufacturerForm(instance=manufacturer)
     else:
@@ -232,7 +247,7 @@ def manufacturer_detail(request, pk):
         return HttpResponse("You don't have the permission to view this")
 
     file_path = manufacturer.product_img
-    qr_codes = generate_qr_code("http://127.0.0.1:8000/manufacturer/{}".format(pk))
+    qr_codes = generate_qr_code(manufacturer.sku)
     return render(request, "manufacturer_detail.html",
                   {"manufacturer": manufacturer,
                    "qr_code": qr_codes,
@@ -240,20 +255,17 @@ def manufacturer_detail(request, pk):
 
 
 ####API SECTION
-@login_required
 class ManufacturerViewSet(viewsets.ModelViewSet):
     """API endpoint for managing manufacturers."""
     queryset = Manufacturer.objects.all().order_by('item')
     serializer_class = ManufacturerSerializer
 
 
-@login_required
 class NoteViewSet(viewsets.ModelViewSet):
     """API endpoint for managing notes."""
     queryset = Note.objects.all().order_by('name')
     serializer_class = FeedbackSerializer
 
-@login_required
 class SearchViewSet(viewsets.ModelViewSet):
     """API endpoint for searching manufacturers."""
     queryset = SearchProduct.objects.all()

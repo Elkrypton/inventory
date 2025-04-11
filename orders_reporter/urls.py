@@ -20,7 +20,7 @@ urlpatterns = [
 
     ### Application front end routers
     path('', index, name='home'),
-    path('', index, name='home'),
+
     path('graph/', GraphView,name='graph'),
     path('myforms/', my_form_view, name='myforms'),
     path('list/',manufacturer_list, name='manufacturer_list'),
@@ -41,3 +41,4 @@ if settings.DEBUG:
         urlpatterns += static(settings.MEDIA_URL,
                               document_root=settings.MEDIA_ROOT)
         
+urlpatterns += router.urls

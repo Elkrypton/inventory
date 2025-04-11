@@ -9,7 +9,6 @@ except ImportError as err:
     print("[!] Please check the following error log:\n=>:{}".format(str(err)))
 
 
-
 class SeleniumTest():
 
     def __init__(self):
@@ -43,7 +42,7 @@ class SeleniumTest():
                 print(e.text)
 
             if any(error_message in e.text for e in errors):
-                print("---LOGIN TEST FAILE----")
+                print("---LOGIN TEST FAILED----")
             else:
                 print("-----LOGIN TEST PASSED----")
         

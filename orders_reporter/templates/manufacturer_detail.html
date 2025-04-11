@@ -49,17 +49,19 @@
 
   /* Table Styling */
   .table {
-    width: 100%;
+    width: 50%;
     background-color: white;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-collapse: collapse;
     margin-top: 20px;
+    margin-left: 25px;
+    padding-left: 50px;
   }
 
   th, td {
-    padding: 16px;
+    padding: 50px;
     text-align: left;
     border-bottom: 1px solid #ddd;
   }
@@ -77,9 +79,9 @@
   /* Card Styling for Product Details */
   .product-details-card {
     background-color: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    padding: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
 
   /* Image Styling */
@@ -89,16 +91,24 @@
     border-radius: 8px;
     object-fit: cover;
   }
+  .main-container {
+    margin: 25px;
+    padding-left: 40px;
+    margin-left: 25px;
+  }
 
   /* QR Code Styling */
   .qr-code {
-    display: block;
+    display: justify;
     max-width: 150px;
     margin: 20px auto;
     border: 1px solid #ddd;
     border-radius: 8px;
   }
 </style>
+<svg id="barcode"></svg>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
 <title>Product Details</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
@@ -107,6 +117,7 @@
 {% block content %}
 <body>
   <h1>Product Details</h1>
+  <div class="main-container">
   <div class="actions-container">
     <a href="{% url 'manufacturer_list' %}" class="btn btn-primary">Back to Items List</a>
     <a href="{% url 'manufacturer_pdf' pk=manufacturer.id %}?download=True" class="btn btn-primary">Download PDF</a>
@@ -142,15 +153,33 @@
         <td>{{ manufacturer.location }}</td>
       </tr>
       <tr>
-        <td>Image</td>
-        <td>
-          <img src="{% static 'images/manufacturer.product_img' %}" alt="Product Image" class="product-image">
+        <td>Barcode</td>
+        <td> <svg id="barcode"></svg>
+
         </td>
       </tr>
+      <tr>
+        
+      </tr>
     </table>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script>
+      JsBarcode("#barcode", "{{ manufacturer.sku }}", {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 2,
+        height: 50,
+        displayValue: true
+      });
+    </script>
+    
+ 
+
 
     <!-- QR Code Section -->
-    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="qr-code">
+
+
+  </div>
   </div>
 </body>
 {% endblock content %}
