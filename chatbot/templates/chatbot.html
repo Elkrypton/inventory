@@ -1,0 +1,105 @@
+<!-- templates/chatbot.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2em;
+        }
+        #chatbox {
+            border: 1px solid #ccc;
+            padding: 1em;
+            max-height: 400px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+        .message {
+            margin: 0.5em 0;
+        }
+        .user {
+            font-weight: bold;
+            color: navy;
+        }
+        .bot {
+            color: green;
+        }
+        #input {
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+    <h2>Inventory Assistant Chatbot</h2>
+    <div id="chatbox"></div>
+    <div id="typing-indicator" style="display: yes;">
+  <em>Bot is typing...</em>
+</div>
+    
+    <div id="input">
+        <input type="text" id="message" placeholder="Ask something..." style="width: 80%;" />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function appendMessage(text, sender) {
+            const div = document.createElement("div");
+            div.className = "message " + sender;
+            div.innerHTML = `<span class="${sender}">${sender === "user" ? "You" : "Rick"}:</span> ${text}`;
+            document.getElementById("chatbox").appendChild(div);
+            document.getElementById("chatbox").scrollTop = document.getElementById("chatbox").scrollHeight;
+        }
+
+async function sendMessage() {
+  const input = document.getElementById("user-input").value;
+  if (!input) return;
+
+  // Show user's message
+  const chatbox = document.getElementById("chatbox");
+  chatbox.innerHTML += `<div><strong>You:</strong> ${input}</div>`;
+
+  // Clear input
+  document.getElementById("user-input").value = "";
+
+  // Show typing indicator
+  document.getElementById("typing-indicator").style.display = "block";
+
+  try {
+    const response = await fetch("/chatbot/ask/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken")
+      },
+      body: JSON.stringify({ question: input })
+    });    
+    const data = await response.json();
+    chatbox.innerHTML += `<div><strong>Rick:</strong> ${data.response}</div>`;
+  } catch (err) {
+    chatbox.innerHTML += `<div><strong>Rick:</strong> Something went wrong.</div>`;
+  } finally {
+    // Hide typing indicator
+    document.getElementById("typing-indicator").style.display = "none";
+  }
+}
+
+// Helper to get CSRF token
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+    </script>
+</body>
+</html>

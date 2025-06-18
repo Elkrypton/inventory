@@ -2,6 +2,14 @@ from .modules import *
 from .models import Manufacturer
 from rest_framework import generics, viewsets
 from .serializers import *
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.http import JsonResponse
+from chatbot.agent import ask_question
+
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 
 import barcode
 import traceback
@@ -246,29 +254,34 @@ def manufacturer_detail(request, pk):
     if manufacturer.owner != request.user:
         return HttpResponse("You don't have the permission to view this")
 
-    file_path = manufacturer.product_img
+ #   file_path = manufacturer.product_img
     qr_codes = generate_qr_code(manufacturer.sku)
     return render(request, "manufacturer_detail.html",
                   {"manufacturer": manufacturer,
-                   "qr_code": qr_codes,
-                   "file_path": file_path})
+                   "qr_code": qr_codes,})
 
 
-####API SECTION
-class ManufacturerViewSet(viewsets.ModelViewSet):
-    """API endpoint for managing manufacturers."""
-    queryset = Manufacturer.objects.all().order_by('item')
-    serializer_class = ManufacturerSerializer
+@api_view(['GET'])
+def get_all_products(request):
+    products = Manufacturer.objects.all()
+    serializer = ManufacturerSerializer(products, many=True)
+    return Response(serializer.data)
+
+# ####API SECTION
+# class ManufacturerViewSet(viewsets.ModelViewSet):
+#     """API endpoint for managing manufacturers."""
+#     queryset = Manufacturer.objects.all().order_by('item')
+#     serializer_class = ManufacturerSerializer
 
 
-class NoteViewSet(viewsets.ModelViewSet):
-    """API endpoint for managing notes."""
-    queryset = Note.objects.all().order_by('name')
-    serializer_class = FeedbackSerializer
+# class NoteViewSet(viewsets.ModelViewSet):
+#     """API endpoint for managing notes."""
+#     queryset = Note.objects.all().order_by('name')
+#     serializer_class = FeedbackSerializer
 
-class SearchViewSet(viewsets.ModelViewSet):
-    """API endpoint for searching manufacturers."""
-    queryset = SearchProduct.objects.all()
-    serializer_class = SearchSerializer
+# class SearchViewSet(viewsets.ModelViewSet):
+#     """API endpoint for searching manufacturers."""
+#     queryset = SearchProduct.objects.all()
+#     serializer_class = SearchSerializer
 
 

@@ -41,7 +41,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
 # SECURITY WARNING: don't run with debug turned on in production!
 
 #DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
-ALLOWED_HOSTS = ['cryptoon.pythonanywhere.com', "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ['cryptoon.pythonanywhere.com', "127.0.0.1", "localhost", "192.168.1.248"]
 
 REST_FRAMEWORK  = {
     'DEFAULT_RENDERER_CLASSES': [
@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'orders_reporter',
     'crispy_forms',
+    'chatbot',
 ]
 
 MIDDLEWARE = [

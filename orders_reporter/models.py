@@ -6,7 +6,7 @@ class Manufacturer(models.Model):
     """Manufacturer model for products details"""
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.CharField(max_length=50)
-    product_img = models.ImageField(upload_to="images/")
+    #product_img = models.ImageField(upload_to="images/", required=False)
     quantity = models.IntegerField()
     date_of_production = models.DateTimeField()
     sku = models.CharField(max_length=50, unique=True)

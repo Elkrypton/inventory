@@ -51,7 +51,7 @@ class TestConnection(unittest.TestCase):
     
     def setUp(self):
 
-        self.root_url = "http://127.0.0.1:8000/inventory/"
+        self.root_url = "http://127.0.0.1:8000/"
         self.req = requests.get(self.root_url)
         self.list_urls = ['list/','graph/','manufacturer/1/','search/','myforms/','edit_manufacturer/1/']
     

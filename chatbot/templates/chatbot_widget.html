@@ -1,0 +1,168 @@
+<!-- chatbot_widget.html -->
+<div id="chatbot-button" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #3f66f0;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+">💬</div>
+
+<div id="chatbot-window" style="
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 370px;
+    height: 500px;
+    background: #f4f6fb;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    display: none;
+    flex-direction: column;
+    z-index: 9999;
+    box-shadow: 0 0 20px rgba(0,0,0,0.25);
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+">
+    <div style="padding: 12px 16px; border-bottom: 1px solid #ddd; font-weight: bold; font-size: 16px; background: #3f66f0; color: white;">
+        Rick – Inventory Assistant
+    </div>
+
+    <div id="chat-log" style="
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    "></div>
+
+    <form id="chat-form" style="display: flex; border-top: 1px solid #ccc; background: white;">
+        <input id="chat-input" type="text" placeholder="Ask something..." style="
+            flex: 1;
+            border: none;
+            padding: 12px 14px;
+            font-size: 14px;
+            outline: none;
+        " />
+        <button type="submit" style="
+            border: none;
+            background: #3f66f0;
+            color: white;
+            padding: 12px 16px;
+            cursor: pointer;
+        ">Send</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const button = document.getElementById('chatbot-button');
+    const windowEl = document.getElementById('chatbot-window');
+    const form = document.getElementById('chat-form');
+    const input = document.getElementById('chat-input');
+    const chatLog = document.getElementById('chat-log');
+
+    // Toggle window
+    button.onclick = () => {
+        if (windowEl.style.display === 'none' || windowEl.style.display === '') {
+            windowEl.style.display = 'flex';
+            windowEl.style.flexDirection = 'column';
+        } else {
+            windowEl.style.display = 'none';
+        }
+    };
+
+    // Message handler
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const userMsg = input.value.trim();
+        if (!userMsg) return;
+
+        // Add user bubble
+        const userBubble = document.createElement('div');
+        userBubble.style.alignSelf = 'flex-end';
+        userBubble.style.maxWidth = '80%';
+        userBubble.style.background = '#3f66f0';
+        userBubble.style.color = 'white';
+        userBubble.style.padding = '10px 14px';
+        userBubble.style.borderRadius = '18px 18px 2px 18px';
+        userBubble.style.fontSize = '14px';
+        userBubble.innerText = userMsg;
+        chatLog.appendChild(userBubble);
+        input.value = '';
+
+        // Typing indicator
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typing-indicator';
+        typingDiv.style.alignSelf = 'flex-start';
+        typingDiv.style.fontStyle = 'italic';
+        typingDiv.style.fontSize = '13px';
+        typingDiv.style.color = '#555';
+        typingDiv.innerText = 'Rick is typing...';
+        chatLog.appendChild(typingDiv);
+        chatLog.scrollTop = chatLog.scrollHeight;
+
+        try {
+            const res = await fetch('/chatbot/ask/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ question: userMsg })
+            });
+
+            const data = await res.json();
+
+            // Remove typing
+            typingDiv.remove();
+
+            // Bot reply
+            const botBubble = document.createElement('div');
+            botBubble.style.alignSelf = 'flex-start';
+            botBubble.style.maxWidth = '80%';
+            botBubble.style.background = '#e2e8f0';
+            botBubble.style.color = '#222';
+            botBubble.style.padding = '10px 14px';
+            botBubble.style.borderRadius = '18px 18px 18px 2px';
+            botBubble.style.fontSize = '14px';
+            botBubble.innerText = data.answer;
+            chatLog.appendChild(botBubble);
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+        } catch (error) {
+            typingDiv.remove();
+            const errorBubble = document.createElement('div');
+            errorBubble.style.alignSelf = 'flex-start';
+            errorBubble.style.color = 'red';
+            errorBubble.innerText = 'Something went wrong. Try again later.';
+            chatLog.appendChild(errorBubble);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+    };
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (const cookie of cookies) {
+                const trimmed = cookie.trim();
+                if (trimmed.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(trimmed.slice(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>

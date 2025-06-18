@@ -16,7 +16,7 @@ class ManufacturerForm(forms.ModelForm):
         """meta class to customize model forms for the manufacturer model"""
         model = Manufacturer
         sku_gen = forms.ChoiceField(choices = CHOICES, widget=forms.RadioSelect())
-        fields = ['item', 'quantity', 'date_of_production', 'sku', 'location', 'product_img']
+        fields = ['item', 'quantity', 'date_of_production', 'sku', 'location']
         widgets = {
 
             'item': forms.TextInput(attrs={'size': '40', 'class': 'form-control'}),
