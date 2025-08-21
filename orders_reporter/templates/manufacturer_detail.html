@@ -1,185 +1,125 @@
-<!DOCTYPE html>
 {% extends 'base.html' %}
-{% block header %}
-{% load bootstrap3 %}
 {% load static %}
-{% bootstrap_css %}
-<style>
-  /* Global Styles */
-  body {
-    background-color: #f9f9f9;
-    font-family: 'Segoe UI', sans-serif;
-    margin-top: 20px;
-    padding: 50px;
-  }
+{% block header %}
+  <title>Product Details</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
-  /* Heading Styles */
-  h1 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 30px;
-  }
+  <style>
+    body {
+      background-color: #f9f9f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
 
-  /* Button Styling */
-  .btn-primary, .btn-danger {
-    padding: 10px 20px;
-    font-size: 14px;
-    border-radius: 6px;
-    text-decoration: none;
-    display: inline-block;
-    margin-right: 10px;
-    color: white;
-  }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin: 2rem 0 1rem;
+      font-weight: 600;
+    }
 
-  .btn-primary {
-    background-color: #007bff;
-  }
+    .actions-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
 
-  .btn-primary:hover {
-    background-color: #0056b3;
-  }
+    .product-details-card {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      max-width: 800px;
+      margin: 0 auto;
+    }
 
-  .btn-danger {
-    background-color: #dc3545;
-  }
+    .table th,
+    .table td {
+      padding: 0.75rem 1rem;
+      vertical-align: middle;
+    }
 
-  .btn-danger:hover {
-    background-color: #c82333;
-  }
+    .table th {
+      background-color: #f1f1f1;
+      font-weight: 600;
+    }
 
-  /* Table Styling */
-  .table {
-    width: 50%;
-    background-color: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-collapse: collapse;
-    margin-top: 20px;
-    margin-left: 25px;
-    padding-left: 50px;
-  }
+    .qr-code {
+      display: block;
+      margin: 1rem auto;
+      max-width: 150px;
+    }
 
-  th, td {
-    padding: 50px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
+    @media (max-width: 768px) {
+      .product-details-card {
+        padding: 1.25rem;
+      }
 
-  th {
-    background-color: #f8f9fa;
-    font-weight: bold;
-    color: #495057;
-  }
+      .table th,
+      .table td {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
 
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
+      h1 {
+        font-size: 1.5rem;
+      }
 
-  /* Card Styling for Product Details */
-  .product-details-card {
-    background-color: white;
-    border-radius: 50px;
-    padding: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Image Styling */
-  .product-image {
-    max-width: 200px;
-    max-height: 200px;
-    border-radius: 8px;
-    object-fit: cover;
-  }
-  .main-container {
-    margin: 25px;
-    padding-left: 40px;
-    margin-left: 25px;
-  }
-
-  /* QR Code Styling */
-  .qr-code {
-    display: justify;
-    max-width: 150px;
-    margin: 20px auto;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-  }
-</style>
-<svg id="barcode"></svg>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
-<title>Product Details</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+      .btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.9rem;
+      }
+    }
+  </style>
 {% endblock header %}
 
 {% block content %}
-<body>
+<div class="container mt-4">
   <h1>Product Details</h1>
-  <div class="main-container">
+
   <div class="actions-container">
-    <a href="{% url 'manufacturer_list' %}" class="btn btn-primary">Back to Items List</a>
-    <a href="{% url 'manufacturer_pdf' pk=manufacturer.id %}?download=True" class="btn btn-primary">Download PDF</a>
-    <a href="{% url 'edit' manufacturer.pk %}" class="btn btn-primary">Edit</a>
-    <a href="{% url 'delete' manufacturer.pk %}" class="btn btn-danger">Delete</a>
-    <a href="{% url 'scan' %}" class="btn btn-primary">Scan</a>
+    <a href="{% url 'manufacturer_list' %}" class="btn btn-outline-success">← Back to Items</a>
+    <a href="{% url 'manufacturer_pdf' pk=manufacturer.id %}?download=True" class="btn btn-outline-primary">📄 Download PDF</a>
+    <a href="{% url 'edit' manufacturer.pk %}" class="btn btn-outline-success">✏️ Edit</a>
+    <a href="{% url 'delete' manufacturer.pk %}" class="btn btn-outline-success">🗑️ Delete</a>
+    <a href="{% url 'scan' %}" class="btn btn-outline-secondary">📷 Scan</a>
   </div>
 
-  <div class="product-details-card mt-4">
-    <table class="table">
-      <tr>
-        <th>Description</th>
-        <th>Details</th>
-      </tr>
-      <tr>
-        <td>Item/Product</td>
-        <td>{{ manufacturer.item }}</td>
-      </tr>
-      <tr>
-        <td>Quantity</td>
-        <td>{{ manufacturer.quantity }}</td>
-      </tr>
-      <tr>
-        <td>Date of Production</td>
-        <td>{{ manufacturer.date_of_production }}</td>
-      </tr>
-      <tr>
-        <td>SKU</td>
-        <td>{{ manufacturer.sku }}</td>
-      </tr>
-      <tr>
-        <td>Location</td>
-        <td>{{ manufacturer.location }}</td>
-      </tr>
-      <tr>
-        <td>Barcode</td>
-        <td> <svg id="barcode"></svg>
-
-        </td>
-      </tr>
-      <tr>
-        
-      </tr>
-    </table>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script>
-      JsBarcode("#barcode", "{{ manufacturer.sku }}", {
-        format: "CODE128",
-        lineColor: "#000",
-        width: 2,
-        height: 50,
-        displayValue: true
-      });
-    </script>
-    
- 
-
-
-    <!-- QR Code Section -->
-
-
+  <div class="product-details-card">
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <tr>
+          <th>Item/Product</th>
+          <td>{{ manufacturer.item }}</td>
+        </tr>
+        <tr>
+          <th>Quantity</th>
+          <td>{{ manufacturer.quantity }}</td>
+        </tr>
+        <tr>
+          <th>Date of Production</th>
+          <td>{{ manufacturer.date_of_production }}</td>
+        </tr>
+        <tr>
+          <th>SKU</th>
+          <td>{{ manufacturer.sku }}</td>
+        </tr>
+        <tr>
+          <th>Location</th>
+          <td>{{ manufacturer.location }}</td>
+        </tr>
+        <tr>
+          <th>Barcode</th>
+          <td><img src="{% url 'product_qr' manufacturer.pk %}" alt="{{ manufacturer.sku }}"</td>
+        </tr>
+      </table>
+    </div>
   </div>
-  </div>
-</body>
+</div>
+
+
+
 {% endblock content %}

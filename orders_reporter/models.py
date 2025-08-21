@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 
 class Manufacturer(models.Model):
     """Manufacturer model for products details"""
+    low_stock_threshold = models.IntegerField(default=5)
+
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.CharField(max_length=50)
     #product_img = models.ImageField(upload_to="images/", required=False)

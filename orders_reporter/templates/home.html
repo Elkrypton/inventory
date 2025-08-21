@@ -1,11 +1,71 @@
 {% extends 'base.html' %}
 
 {% block header %}
+
 {% endblock header %}
 {% block content %}
 
-<h1>
-    Inventory management interface to accurately record and assign products to locations
-    <h4>New update, you can now submit a feedback or report an issue.</h4>
-</h1>
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventory Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-6">
+
+    <h1 class="text-3xl font-bold mb-6">📦 Inventory Dashboard</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Items -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-semibold">Total Items</h2>
+            <p class="text-2xl font-bold text-blue-600">{{ total_items }}</p>
+        </div>
+
+        <!-- Total Quantity -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-semibold">Total Quantity</h2>
+            <p class="text-2xl font-bold text-green-600">{{ total_quantity }}</p>
+        </div>
+
+        <!-- Low Stock Count -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-semibold">Low Stock Items</h2>
+            <p class="text-2xl font-bold text-red-600">{{ low_stock|length }}</p>
+        </div>
+    </div>
+
+    <!-- Low Stock List -->
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">⚠️ Low Stock Alerts</h2>
+        {% if low_stock %}
+            <ul class="space-y-2">
+                {% for item in low_stock %}
+                    <li class="border-l-4 border-red-500 pl-4">
+                        {{ item.item }} — Qty: {{ item.quantity }} (Threshold: {{ item.low_stock_threshold }})
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">All inventory levels are healthy.</p>
+        {% endif %}
+    </div>
+
+    <!-- Recently Added -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">🆕 Recently Added</h2>
+        <ul class="space-y-2">
+            {% for item in recent_items %}
+                <li class="border-b pb-2">
+                    <strong>{{ item.item }}</strong> — {{ item.date_of_production }} (Qty: {{ item.quantity }})
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>
+
 {% endblock content %}

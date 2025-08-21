@@ -1,79 +1,126 @@
-<!DOCTYPE html>
 {% extends "base.html" %}
-{% load bootstrap3 %}
-{% block content %}
+{% load static %}
+
 {% block header %}
-<title>Products List</title>
-<meta charset="utf-8">
+  <title>Inventory Products</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 {% endblock header %}
 
+{% block content %}
 <style>
-  /* Container for product cards */
   .products-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 40px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    padding: 2rem;
   }
 
-  /* Individual product card styling */
   .product-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-    overflow: hidden;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .product-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
   }
 
   .product-content {
-    padding: 30px;
+    padding: 1.5rem;
   }
 
-  /* Card title (Item name) */
   .product-title {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #333;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
     text-decoration: none;
+    display: block;
+    margin-bottom: 0.5rem;
   }
 
   .product-title:hover {
-    color: #007bff;
+    color: #0d6efd;
   }
 
-  /* Additional product details */
   .product-details {
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 8px;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin: 0.25rem 0;
   }
 
-  /* Empty state message styling */
+  .actions-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 2rem 0;
+  }
+
+  .btn-export {
+    background-color: #0d6efd;
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+
+  .btn-export:hover {
+    background-color: #0b5ed7;
+    color: white;
+  }
+
   .empty-message {
     text-align: center;
-    font-size: 1.4rem;
-    color: #666;
-    margin-top: 40px;
+    font-size: 1.2rem;
+    color: #6c757d;
+    padding: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    .product-title {
+      font-size: 1.1rem;
+    }
+
+    .product-content {
+      padding: 1rem;
+    }
+
+    .btn-export {
+      width: 100%;
+      text-align: center;
+      margin-top: 1rem;
+    }
   }
 </style>
 
+<div class="actions-container">
+  <a href="{% url 'export_excel' %}" class="btn-export">Export to Excel</a>
+</div>
+
 <div class="products-container">
   {% for manufacturer in manufacturers %}
-  <div class="product-card">
-    <div class="product-content">
-      <a class="product-title" href="{% url 'manufacturer_detail' manufacturer.pk %}">{{ manufacturer.item }}</a>
-      <p class="product-details">Created: {{ manufacturer.date_added|date:'M d, Y H:i' }}</p>
-      <p class="product-details">Location: {{ manufacturer.location }}</p>
+    <div class="product-card">
+      <div class="product-content">
+        <a class="product-title" href="{% url 'manufacturer_detail' manufacturer.pk %}">
+          {{ manufacturer.item }}
+        </a>
+        <p class="product-details">Created: {{ manufacturer.date_added|date:'M d, Y H:i' }}</p>
+        <p class="product-details">Location: {{ manufacturer.location }}</p>
+        {% if manufacturer.quantity < manufacturer.low_stock_threshold %}
+          <p class="product-details text-danger"><strong>⚠ Low Stock</strong></p>
+        {% endif %}
+      </div>
     </div>
-  </div>
   {% empty %}
-  <div class="empty-message">
-    <h2>The list is empty, create a new item/product!</h2>
-  </div>
+    <div class="empty-message">
+      <p>The list is empty. Start by creating a new product!</p>
+    </div>
   {% endfor %}
 </div>
 

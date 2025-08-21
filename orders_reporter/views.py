@@ -6,14 +6,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from chatbot.agent import ask_question
-
+import csv
 from django.views.decorators.csrf import csrf_exempt
 import json
-
-
 import barcode
 import traceback
-
 import io
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -23,6 +20,7 @@ import qrcode
 from .forms import SearchForm
 from io import BytesIO
 import base64
+from django.db.models import F
 from django.template.loader import get_template
 from django.views import View
 import xhtml2pdf.pisa as pisa
@@ -37,6 +35,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from barcode.writer import ImageWriter
 from barcode import Code39
+from django.db.models import Sum
 
 # def generate_qr_code(sku):
 #     code_obj = Code39(sku, writer=ImageWriter())
@@ -147,21 +146,17 @@ def feedback(request):
     return render(request, 'note.html', {'feedback': feedback})
 
 
-def generate_qr_code(data):
+def generate_qr_code(request, pk):
     """Generate a QR code from input data."""
-    qr = qrcode.QRCode(
-        version=2,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=6,
-        border=2,
-    )
-    qr.add_data(data)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
+    product = Manufacturer.objects.get(pk=pk)
+    url = request.build_absolute_uri(f'/manufacturer/{pk}/')
+    qr = qrcode.make(url)
 
     buffer = BytesIO()
-    img.save(buffer, "PNG")
-    return base64.b64encode(buffer.getvalue()).decode()
+    qr.save(buffer, format="PNG")
+    return HttpResponse(buffer.getvalue(), content_type="image/png")
+
+
 
 
 @login_required
@@ -182,9 +177,18 @@ def manufacturer_edit(request, pk):
 
 @login_required
 def index(request):
-    """Handle the main index page."""
-    return render(request, 'home.html')
+    inventory = Manufacturer.objects.filter(owner=request.user)
+    low_stock = inventory.filter(quantity__lt=F('low_stock_threshold'))
+    total_items = inventory.count()
+    total_quantity = inventory.aggregate(Sum('quantity'))['quantity__sum'] or 0
+    recent_items = inventory.order_by('-date_of_production')[:5]
 
+    return render(request, 'home.html', {
+        'low_stock': low_stock,
+        'total_items': total_items,
+        'total_quantity': total_quantity,
+        'recent_items': recent_items,
+    })
 @login_required
 def render_to_pdf(template_src, context_dict={}):
     """Render a template to a PDF."""
@@ -255,10 +259,10 @@ def manufacturer_detail(request, pk):
         return HttpResponse("You don't have the permission to view this")
 
  #   file_path = manufacturer.product_img
-    qr_codes = generate_qr_code(manufacturer.sku)
+    #qr_codes = generate_qr_code(manufacturer.sku)
     return render(request, "manufacturer_detail.html",
                   {"manufacturer": manufacturer,
-                   "qr_code": qr_codes,})
+                   })
 
 
 @api_view(['GET'])
@@ -266,6 +270,17 @@ def get_all_products(request):
     products = Manufacturer.objects.all()
     serializer = ManufacturerSerializer(products, many=True)
     return Response(serializer.data)
+
+
+@login_required
+def export_inventory(request):
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="inventory.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Item', 'SKU', 'Quantity'])
+    for item in Manufacturer.objects.filter(owner=request.user):
+        writer.writerow([item.item, item.sku, item.quantity])
+    return response
 
 # ####API SECTION
 # class ManufacturerViewSet(viewsets.ModelViewSet):
