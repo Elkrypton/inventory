@@ -1,7 +1,8 @@
 # chatbot/vector_store_utils.py
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.schema import Document
+# Modern Import (v1.x)
+from langchain_core.documents import Document
 
 def add_to_vector_store(manufacturer):
     print("vector store triggered")

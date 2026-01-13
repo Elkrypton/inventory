@@ -1,186 +1,232 @@
-<!DOCTYPE html>
 {% extends 'base.html' %}
 {% block content %}
 {% load bootstrap3 %}
-<title>Search</title>
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
-</head>
 
 <style>
-  /* Global reset for the page */
+  /* INDUSTRIAL LIGHT: SEARCH TERMINAL OVERRIDE */
+  :root {
+    --ios-blue: #007AFF;
+    --industrial-gray: #1C1C1E;
+    --technical-bg: #F2F2F7;
+    --panel-bg: #FFFFFF;
+    --border-stroke: #D1D1D6;
+    --mono-font: 'JetBrains Mono', 'Menlo', monospace;
+  }
+
   body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f4f7fc;
-    margin: 0;
-    padding: 0;
+    background-color: var(--technical-bg);
+    color: var(--industrial-gray);
+    font-family: 'Inter', sans-serif;
+    display: block; /* Overriding your center flex for a standard layout */
+    height: auto;
+    overflow-y: auto;
+  }
+
+  /* SYSTEM FRAME */
+  .system-search-deck {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: var(--panel-bg);
+    border: 2px solid var(--industrial-gray);
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.05);
+  }
+
+  /* TOP CONTROL BAR */
+  .control-bar {
+    background: var(--industrial-gray);
+    color: white;
+    padding: 10px 20px;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  /* Container styles for the content */
-  .container-search {
-    background: white;
-    border-radius: 8px;
-    padding: 40px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 150%;
-    max-width: 900px;
-    margin-top: 30px;
-  }
-
-  h1 {
-    font-size: 28px;
-    font-weight: 600;
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-  }
-
-  /* Form styles */
-  form {
-    display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    font-family: var(--mono-font);
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  .protocol-label {
+    background: var(--ios-blue);
+    padding: 2px 8px;
+    font-weight: bold;
+  }
+
+  /* SEARCH INPUT AREA */
+  .query-module {
+    padding: 40px;
+    border-bottom: 1px solid var(--border-stroke);
+    background: #FAFAFA;
+  }
+
+  .query-input-group {
+    display: flex;
+    gap: 0; /* Merged industrial look */
+    max-width: 800px;
+    margin: 0 auto;
   }
 
   input[type="text"] {
-    width: 80%;
-    padding: 14px 20px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
+    flex-grow: 1;
+    background: #FFFFFF;
+    border: 2px solid var(--industrial-gray);
+    padding: 16px 24px;
+    font-family: var(--mono-font);
+    font-size: 15px;
     outline: none;
+    transition: all 0.2s;
   }
 
   input[type="text"]:focus {
-    border-color: #1974D2;
+    background: #F2F2F7;
+    box-shadow: inset 4px 4px 0px rgba(0,122,255,0.1);
   }
 
   .button1 {
-    padding: 12px 30px;
-    background-color: #1974D2;
+    background: var(--ios-blue);
     color: white;
-    font-size: 16px;
-    font-weight: 500;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-    border: none;
+    border: 2px solid var(--industrial-gray);
+    border-left: none;
+    padding: 0 40px;
+    font-family: var(--mono-font);
+    font-weight: 900;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: all 0.2s;
   }
 
   .button1:hover {
-    background-color: #155a8a;
-    transform: scale(1.05);
+    background: var(--industrial-gray);
+    color: var(--ios-blue);
   }
 
-  /* Table styling */
-  .table-container {
-    margin-top: 40px;
-    text-align: center;
+  /* RESULTS TABLE: PRECISION GRID */
+  .results-module {
+    padding: 40px;
+  }
+
+  .results-header {
+    font-family: var(--mono-font);
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #8E8E93;
+    display: flex;
+    justify-content: space-between;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-  }
-
-  th, td {
-    padding: 14px;
-    text-align: left;
-    border: 1px solid #ddd;
-    font-size: 16px;
-    font-weight: 400;
+    font-family: var(--mono-font);
   }
 
   th {
-    background-color: #f1f1f1;
-    font-weight: 600;
-    color: #444;
+    background: var(--technical-bg);
+    border: 1px solid var(--border-stroke);
+    padding: 12px 15px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--industrial-gray);
+    text-align: left;
   }
 
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
+  td {
+    border: 1px solid var(--border-stroke);
+    padding: 15px;
+    font-size: 13px;
+    color: var(--industrial-gray);
   }
+
+  tr:nth-child(even) { background: #FAFAFA; }
 
   tr:hover {
-    background-color: #e6f3ff;
-    cursor: pointer;
+    background: #F2F2F7;
+    outline: 1px solid var(--ios-blue);
   }
+
+  td a {
+    color: var(--ios-blue);
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  td a:hover { text-decoration: underline; }
 
   .no-results {
-    font-size: 18px;
-    font-weight: 500;
-    color: #333;
+    font-family: var(--mono-font);
+    color: #FF3B30; /* System Red */
     text-align: center;
-    margin-top: 30px;
+    padding: 40px;
+    font-size: 13px;
+    background: #FFF5F5;
+    border: 1px dashed #FF3B30;
   }
 
-  /* Mobile responsiveness */
+  /* RESPONSIVE */
   @media (max-width: 768px) {
-    .container {
-      padding: 20px;
-    }
-
-    input[type="text"] {
-      width: 90%;
-    }
-
-    .button1 {
-      width: 100%;
-    }
-
-    table {
-      font-size: 14px;
-    }
+    .query-input-group { flex-direction: column; gap: 10px; }
+    .button1 { border-left: 2px solid var(--industrial-gray); padding: 15px; }
+    .system-search-deck { margin: 10px; }
   }
-
 </style>
 
-<body>
-  <div class="container-search">
-    <h1>Search for Products</h1>
-    <form method="get">
-      <input type="text" name="query" maxlength="100" placeholder="Search by SKU or Product Name" value="{{ request.GET.query }}">
-      {% csrf_token %}
-      <button type="submit" id="id_search" class="button1">Search</button>
-    </form>
+<div class="system-search-deck">
+  <div class="control-bar">
+    <div><span class="protocol-label">QUERY</span> DATA_RETRIEVAL_SERVICE</div>
+    <div id="sys-clock">00:00:00</div>
+  </div>
 
+  <div class="query-module">
+    <form method="get">
+      <div class="query-input-group">
+        <input type="text" name="query" maxlength="100" placeholder="ENTER_SKU_OR_ITEM_ID..." value="{{ request.GET.query }}">
+        {% csrf_token %}
+        <button type="submit" id="id_search" class="button1">EXECUTE</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="results-module">
     {% if results %}
-    <div class="table-container">
-      <h4>Search Results:</h4>
-      <table>
+    <div class="results-header">
+      <span>MATCH_FOUND: {{ results|length }} RECORDS</span>
+      <span>INDEX_SORT: TIMESTAMP_DESC</span>
+    </div>
+    <table>
+      <thead>
         <tr>
-          <th>Item</th>
-          <th>Date Created</th>
-          <th>Location</th>
+          <th>[ID] OBJECT_NOMENCLATURE</th>
+          <th>TIMESTAMP</th>
+          <th>SEC_LOCATION</th>
         </tr>
+      </thead>
+      <tbody>
         {% for manufacturer in results %}
         <tr>
-          <td><a href="{% url 'manufacturer_detail' manufacturer.pk %}">{{ manufacturer.item }}</a></td>
-          <td>{{ manufacturer.date_added|date:'M d,Y H:i' }}</td>
-          <td>{{ manufacturer.location }}</td>
+          <td><a href="{% url 'manufacturer_detail' manufacturer.pk %}">{{ manufacturer.item|upper }}</a></td>
+          <td>{{ manufacturer.date_added|date:'Y.m.d // H:i' }}</td>
+          <td>{{ manufacturer.location|upper }}</td>
         </tr>
         {% endfor %}
-      </table>
+      </tbody>
+    </table>
+    {% elif request.GET.query %}
+    <div class="no-results">
+      ERROR_404: NO_RECORDS_MATCH_STRING ["{{ request.GET.query }}"]
     </div>
     {% else %}
-    <p class="no-results">No results found. Please try another search.</p>
+    <div class="results-header" style="justify-content: center;">
+      AWAITING_QUERY_INPUT...
+    </div>
     {% endif %}
   </div>
-</body>
+</div>
 
+<script>
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('sys-clock').innerText = now.toTimeString().split(' ')[0];
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+</script>
 {% endblock content %}

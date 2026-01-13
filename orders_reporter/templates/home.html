@@ -1,71 +1,215 @@
 {% extends 'base.html' %}
 
-{% block header %}
-
-{% endblock header %}
 {% block content %}
+<style>
+    /* INDUSTRIAL DASHBOARD OVERRIDE */
+    #dashboard-shell {
+        --blue: #0066FF;
+        --dark: #121212;
+        --danger: #FF3B30;
+        --border: #121212;
+        --mono: 'JetBrains Mono', monospace;
+        padding: 20px;
+    }
 
-<!-- templates/home.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Inventory Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 text-gray-800 p-6">
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
 
-    <h1 class="text-3xl font-bold mb-6">📦 Inventory Dashboard</h1>
+    /* DATA CARDS */
+    .stat-module {
+        background: #FFF;
+        border: 2px solid var(--border);
+        padding: 25px;
+        box-shadow: 8px 8px 0px rgba(0,0,0,0.05);
+        position: relative;
+    }
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <!-- Total Items -->
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-semibold">Total Items</h2>
-            <p class="text-2xl font-bold text-blue-600">{{ total_items }}</p>
+    .stat-module::before {
+        content: "PROPERTY_VALUE";
+        position: absolute;
+        top: -10px; left: 15px;
+        background: var(--dark);
+        color: #FFF;
+        font-family: var(--mono);
+        font-size: 9px;
+        padding: 2px 8px;
+    }
+
+    .stat-label {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #8E8E93;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 900;
+        letter-spacing: -1px;
+    }
+
+    /* ALERTS SECTION */
+    .system-log {
+        background: #FFF;
+        border: 2px solid var(--border);
+        margin-bottom: 30px;
+    }
+
+    .log-header {
+        background: var(--dark);
+        color: #FFF;
+        padding: 10px 20px;
+        font-family: var(--mono);
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .log-body {
+        padding: 20px;
+    }
+
+    .alert-item {
+        background: #FFF5F5;
+        border: 1px solid var(--danger);
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: var(--mono);
+        font-size: 13px;
+    }
+
+    .alert-tag {
+        background: var(--danger);
+        color: white;
+        padding: 2px 6px;
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    /* RECENT ACTIVITY */
+    .activity-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--mono);
+        font-size: 13px;
+    }
+
+    .activity-table th {
+        text-align: left;
+        padding: 12px;
+        background: #F2F2F7;
+        border-bottom: 2px solid var(--border);
+        font-size: 11px;
+        color: #666;
+    }
+
+    .activity-table td {
+        padding: 12px;
+        border-bottom: 1px solid #EEE;
+    }
+
+    .activity-table tr:hover {
+        background: #F9F9F9;
+    }
+
+    @media (max-width: 992px) {
+        .dashboard-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div id="dashboard-shell">
+    
+    <div style="margin-bottom: 40px; border-bottom: 4px solid var(--dark); padding-bottom: 10px;">
+        <h1 style="font-weight: 900; font-size: 28px; text-transform: uppercase; letter-spacing: 2px;">
+            SYSTEM_OVERVIEW <span style="color: var(--blue);">[LIVE]</span>
+        </h1>
+        <p style="font-family: var(--mono); font-size: 11px; color: #666;">CORE_ID: 0x882A // SESSION_STABLE</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="stat-module">
+            <span class="stat-label">Total Unique SKUs</span>
+            <div class="stat-value" style="color: var(--blue);">{{ total_items }}</div>
         </div>
-
-        <!-- Total Quantity -->
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-semibold">Total Quantity</h2>
-            <p class="text-2xl font-bold text-green-600">{{ total_quantity }}</p>
+        <div class="stat-module">
+            <span class="stat-label">Gross Unit Volume</span>
+            <div class="stat-value">{{ total_quantity }}</div>
         </div>
-
-        <!-- Low Stock Count -->
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-semibold">Low Stock Items</h2>
-            <p class="text-2xl font-bold text-red-600">{{ low_stock|length }}</p>
+        <div class="stat-module" style="border-color: var(--danger);">
+            <span class="stat-label">Critical Alerts</span>
+            <div class="stat-value" style="color: var(--danger);">{{ low_stock|length }}</div>
         </div>
     </div>
 
-    <!-- Low Stock List -->
-    <div class="bg-white shadow rounded-lg p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-4">⚠️ Low Stock Alerts</h2>
-        {% if low_stock %}
-            <ul class="space-y-2">
+    <div class="system-log">
+        <div class="log-header">
+            <span>⚠️ CRITICAL_STOCK_ALERTS</span>
+            <span>PRIORITY: HIGH</span>
+        </div>
+        <div class="log-body">
+            {% if low_stock %}
                 {% for item in low_stock %}
-                    <li class="border-l-4 border-red-500 pl-4">
-                        {{ item.item }} — Qty: {{ item.quantity }} (Threshold: {{ item.low_stock_threshold }})
-                    </li>
+                <div class="alert-item">
+                    <div>
+                        <span class="alert-tag">LOW_STOCK</span>
+                        <strong style="margin-left: 10px;">{{ item.item|upper }}</strong>
+                    </div>
+                    <div>
+                        QTY: <span style="color: var(--danger)">{{ item.quantity }}</span> / 
+                        REF: {{ item.low_stock_threshold }}
+                    </div>
+                </div>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-gray-500">All inventory levels are healthy.</p>
-        {% endif %}
+            {% else %}
+                <p style="font-family: var(--mono); color: #8E8E93; text-align: center; padding: 20px;">
+                    >> ALL_SYSTEMS_NOMINAL: NO_ALERTS_FOUND
+                </p>
+            {% endif %}
+        </div>
     </div>
 
-    <!-- Recently Added -->
-    <div class="bg-white shadow rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">🆕 Recently Added</h2>
-        <ul class="space-y-2">
-            {% for item in recent_items %}
-                <li class="border-b pb-2">
-                    <strong>{{ item.item }}</strong> — {{ item.date_of_production }} (Qty: {{ item.quantity }})
-                </li>
-            {% endfor %}
-        </ul>
+    <div class="system-log">
+        <div class="log-header" style="background: var(--blue);">
+            <span>🆕 RECENT_LEDGER_ENTRIES</span>
+            <span>LIMIT: 10_RECORDS</span>
+        </div>
+        <div class="log-body" style="padding: 0;">
+            <table class="activity-table">
+                <thead>
+                    <tr>
+                        <th>OBJECT_NAME</th>
+                        <th>TIMESTAMP</th>
+                        <th>QUANTITY</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recent_items %}
+                    <tr>
+                        <td><strong>{{ item.item|upper }}</strong></td>
+                        <td>{{ item.date_added|date:"H:i // Y.m.d" }}</td>
+                        <td>{{ item.quantity }} units</td>
+                        <td style="color: var(--blue); font-weight: bold;">INITIALIZED</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+</div>
 
-</body>
-</html>
+<script>
+    // System Clock for Dashboard
+    console.log("DASHBOARD_PROTOCOL_INITIALIZED");
+</script>
 
 {% endblock content %}

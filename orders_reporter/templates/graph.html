@@ -1,170 +1,213 @@
-<!-- plot_template.html -->
 {% extends 'base.html' %}
 {% block content %}
-<title>Inventory Stats</title>
-
-<!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-<!-- Main Container -->
-<div class="container">
-  <h1 class="text-center my-5">Inventory Statistics</h1>
+<style>
+  /* INDUSTRIAL ANALYTICS OVERRIDE */
+  :root {
+    --ios-blue: #007AFF;
+    --industrial-gray: #1C1C1E;
+    --technical-bg: #F2F2F7;
+    --panel-bg: #FFFFFF;
+    --border-stroke: #D1D1D6;
+    --mono-font: 'JetBrains Mono', monospace;
+  }
 
-  <!-- Charts -->
-  <div class="row justify-content-center">
-    <!-- Line Chart -->
-    <div class="col-md-6">
-      <canvas id="lineChart"></canvas>
+  body {
+    background-color: var(--technical-bg);
+    color: var(--industrial-gray);
+    font-family: 'Inter', sans-serif;
+    padding: 0;
+  }
+
+  /* SYSTEM CONTAINER */
+  .stats-deck {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  /* TOP TELEMETRY HEADER */
+  .telemetry-header {
+    background: var(--industrial-gray);
+    color: white;
+    padding: 20px 40px;
+    border: 2px solid var(--industrial-gray);
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+
+  .telemetry-header h1 {
+    font-family: var(--mono-font);
+    font-size: 1.25rem;
+    margin: 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .sys-status {
+    font-family: var(--mono-font);
+    font-size: 10px;
+    opacity: 0.8;
+  }
+
+  /* GRID FOR CHARTS */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  /* INDIVIDUAL DATA MODULES */
+  .data-module {
+    background: var(--panel-bg);
+    border: 2px solid var(--industrial-gray);
+    box-shadow: 6px 6px 0px var(--border-stroke);
+    padding: 25px;
+    position: relative;
+  }
+
+  .module-label {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: var(--ios-blue);
+    color: white;
+    font-family: var(--mono-font);
+    font-size: 10px;
+    padding: 2px 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .chart-container {
+    height: 400px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 992px) {
+    .chart-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="stats-deck">
+  <div class="telemetry-header">
+    <h1><span style="color: var(--ios-blue)">[</span> DATA_VISUALIZATION_ENGINE <span style="color: var(--ios-blue)">]</span></h1>
+    <div class="sys-status">
+      STATUS: STREAMING_ACTIVE <br>
+      REFRESH_RATE: REALTIME
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="data-module">
+      <div class="module-label">MODULE_01 // LINEAR_DISTRIBUTION</div>
+      <div class="chart-container">
+        <canvas id="lineChart"></canvas>
+      </div>
     </div>
 
-    <!-- Bar Chart -->
-    <div class="col-md-6">
-      <canvas id="lineChart2"></canvas>
+    <div class="data-module">
+      <div class="module-label">MODULE_02 // VOLUMETRIC_ANALYSIS</div>
+      <div class="chart-container">
+        <canvas id="lineChart2"></canvas>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Line Chart (Product Counts)
-    var ctx = document.getElementById('lineChart').getContext('2d');
-    var items = {{ items|safe }};
-    var counts = {{ counts|safe }};
-    var lineChart = new Chart(ctx, {
+    // Chart.js Global Industrial Defaults
+    Chart.defaults.font.family = "'JetBrains Mono', monospace";
+    Chart.defaults.font.size = 10;
+    Chart.defaults.color = '#1C1C1E';
+
+    // Data Parsing
+    const items = {{ items|safe }};
+    const counts = {{ counts|safe }};
+    const products = {{ products|safe }};
+    const quantities = {{ quantities|safe }};
+
+    // Module 01: Line Chart (Technical Style)
+    var ctx1 = document.getElementById('lineChart').getContext('2d');
+    new Chart(ctx1, {
       type: 'line',
       data: {
         labels: items,
         datasets: [{
-          label: 'Product Counts',
+          label: 'FREQ_COUNT',
           data: counts,
-          backgroundColor: 'rgba(106, 90, 205, 0.2)',  // Soft purple gradient
-          borderColor: 'rgba(106, 90, 205, 1)',     // Purple line
-          borderWidth: 2,
-          pointRadius: 5,
-          pointBackgroundColor: 'rgba(106, 90, 205, 1)',
-          tension: 0.4,  // Smooth line
+          borderColor: '#007AFF',
+          backgroundColor: 'rgba(0, 122, 255, 0.05)',
+          borderWidth: 3,
+          pointStyle: 'rect', // Industrial square points
+          pointRadius: 6,
+          pointHoverRadius: 10,
+          fill: true,
+          tension: 0, // Hard angles for industrial look
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 5,
-            },
-            grid: {
-              borderColor: '#ddd',
-            }
-          },
-          x: {
-            grid: {
-              borderColor: '#ddd',
-            }
-          }
-        },
         plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              font: {
-                size: 14,
-                family: "'Poppins', sans-serif"
-              }
-            }
+          legend: { display: false } // Custom labels used instead
+        },
+        scales: {
+          y: { 
+            beginAtZero: true,
+            grid: { color: '#E5E5EA', lineWidth: 1 },
+            ticks: { padding: 10 }
           },
+          x: { 
+            grid: { display: false },
+            ticks: { padding: 10 }
+          }
         }
       }
     });
 
-    // Bar Chart (Product Quantities)
-    var crt = document.getElementById('lineChart2').getContext('2d');
-    var products = {{ products|safe }};
-    var quantities = {{ quantities|safe }};
-    var barChart = new Chart(crt, {
+    // Module 02: Bar Chart (High Contrast Style)
+    var ctx2 = document.getElementById('lineChart2').getContext('2d');
+    new Chart(ctx2, {
       type: 'bar',
       data: {
         labels: products,
         datasets: [{
-          label: 'Product Quantities',
+          label: 'UNIT_QUANTITY',
           data: quantities,
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',  // Light teal bars
-          borderColor: 'rgba(75, 192, 192, 1)',      // Teal border
-          borderWidth: 1,
-          hoverBackgroundColor: 'rgba(75, 192, 192, 0.4)',
-          hoverBorderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: '#1C1C1E',
+          hoverBackgroundColor: '#5856D6',
+          borderWidth: 0,
+          barPercentage: 0.6
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 5,
-            },
-            grid: {
-              borderColor: '#ddd',
-            }
-          },
-          x: {
-            grid: {
-              borderColor: '#ddd',
-            }
-          }
-        },
         plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              font: {
-                size: 14,
-                family: "'Poppins', sans-serif"
-              }
-            }
+          legend: { display: false }
+        },
+        scales: {
+          y: { 
+            beginAtZero: true,
+            grid: { color: '#E5E5EA', borderDash: [5, 5] },
+            ticks: { padding: 10 }
           },
+          x: { 
+            grid: { display: false },
+            ticks: { padding: 10 }
+          }
         }
       }
     });
   });
 </script>
-
-<!-- Styling for Better Design -->
-<style>
-  body {
-    background-color: #f7fafc;
-    font-family: 'Poppins', sans-serif;
-    padding: 50px 0;
-  }
-
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-
-  h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #1f2937;
-  }
-
-  .row {
-    margin-top: 30px;
-  }
-
-  .col-md-6 {
-    margin-bottom: 30px;
-  }
-
-  canvas {
-    max-width: 100%;
-    height: 400px;  /* Set a fixed height for better layout */
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-</style>
 
 {% endblock content %}

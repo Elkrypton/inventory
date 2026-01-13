@@ -23,8 +23,9 @@ urlpatterns = [
     path('myforms/', my_form_view, name='myforms'),
     path('export_excel/', export_inventory, name="export_excel"),
     path('list/',manufacturer_list, name='manufacturer_list'),
-    path('manufacturer/<int:pk>/pdf/', GeneratePDF.as_view(), name="manufacturer_pdf"),
     path('delete/<int:pk>', delete_manufacturer, name="delete"),
+    path("manufacturer/<int:pk>/pdf/", manufacturer_pdf, name="manufacturer_pdf"),
+
     path('manufacturer/<int:pk>/', manufacturer_detail, name='manufacturer_detail'),
     path('scan/',qrcode_scanner, name='scan'),
     path('search/',product_search, name="search"),

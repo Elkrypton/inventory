@@ -1,125 +1,241 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
-{% block header %}
-  <title>Product Details</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
-  <style>
-    body {
-      background-color: #f9f9f9;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    h1 {
-      text-align: center;
-      color: #333;
-      margin: 2rem 0 1rem;
-      font-weight: 600;
-    }
-
-    .actions-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .product-details-card {
-      background-color: #fff;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .table th,
-    .table td {
-      padding: 0.75rem 1rem;
-      vertical-align: middle;
-    }
-
-    .table th {
-      background-color: #f1f1f1;
-      font-weight: 600;
-    }
-
-    .qr-code {
-      display: block;
-      margin: 1rem auto;
-      max-width: 150px;
-    }
-
-    @media (max-width: 768px) {
-      .product-details-card {
-        padding: 1.25rem;
-      }
-
-      .table th,
-      .table td {
-        padding: 0.5rem;
-        font-size: 0.9rem;
-      }
-
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      .btn {
-        font-size: 0.9rem;
-        padding: 0.5rem 0.9rem;
-      }
-    }
-  </style>
-{% endblock header %}
 
 {% block content %}
-<div class="container mt-4">
-  <h1>Product Details</h1>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
-  <div class="actions-container">
-    <a href="{% url 'manufacturer_list' %}" class="btn btn-outline-success">← Back to Items</a>
-    <a href="{% url 'manufacturer_pdf' pk=manufacturer.id %}?download=True" class="btn btn-outline-primary">📄 Download PDF</a>
-    <a href="{% url 'edit' manufacturer.pk %}" class="btn btn-outline-success">✏️ Edit</a>
-    <a href="{% url 'delete' manufacturer.pk %}" class="btn btn-outline-success">🗑️ Delete</a>
-    <a href="{% url 'scan' %}" class="btn btn-outline-secondary">📷 Scan</a>
-  </div>
+<style>
+  /* AGGRESSIVE CSS OVERRIDE - GOD MODE INDUSTRIAL */
+  #industrial-wrapper {
+    --blue: #0066FF;
+    --dark: #121212;
+    --gray-bg: #F8F9FA;
+    --border: #000000;
+    --mono: 'JetBrains Mono', monospace;
+    
+    font-family: 'Inter', sans-serif;
+    background-color: var(--gray-bg);
+    padding: 40px 20px;
+    min-height: 100vh;
+    color: var(--dark);
+  }
 
-  <div class="product-details-card">
-    <div class="table-responsive">
-      <table class="table table-bordered">
+  /* CENTER PANEL */
+  .master-panel {
+    max-width: 850px;
+    margin: 0 auto;
+    background: #FFF;
+    border: 3px solid var(--border); /* Thick Industrial Border */
+    box-shadow: 12px 12px 0px #E0E0E0;
+    position: relative;
+  }
+
+  /* TOP STATUS HEADER */
+  .panel-header {
+    background: var(--dark);
+    color: #FFF;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-header h1 {
+    font-size: 14px;
+    font-family: var(--mono);
+    margin: 0;
+    letter-spacing: 2px;
+    font-weight: 700;
+  }
+
+  .sys-id {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--blue);
+    padding: 2px 8px;
+  }
+
+  /* ACTION COMMAND BAR */
+  .command-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    border-bottom: 3px solid var(--border);
+  }
+
+  .cmd-btn {
+    padding: 15px;
+    border: none;
+    border-right: 1px solid #EEE;
+    background: #FFF;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none !important;
+    color: var(--dark);
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+
+  .cmd-btn:hover {
+    background: var(--dark);
+    color: #FFF;
+  }
+
+  .cmd-btn.danger:hover {
+    background: #FF3B30;
+    color: #FFF;
+  }
+
+  /* DATASHEET CONTENT */
+  .datasheet-content {
+    padding: 40px;
+  }
+
+  .product-title-area {
+    margin-bottom: 30px;
+    border-left: 5px solid var(--blue);
+    padding-left: 20px;
+  }
+
+  .product-title-area h2 {
+    font-size: 32px;
+    font-weight: 900;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .product-title-area span {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--blue);
+  }
+
+  /* TECHNICAL DATA TABLE */
+  .tech-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+  }
+
+  .tech-table th {
+    width: 35%;
+    background: #F2F2F2;
+    border: 1px solid var(--border);
+    padding: 12px 15px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  .tech-table td {
+    border: 1px solid var(--border);
+    padding: 12px 15px;
+    font-family: var(--mono);
+    font-size: 14px;
+  }
+
+  /* BARCODE BOX */
+  .asset-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    border: 2px dashed #CCC;
+    padding: 20px;
+    background: #FAFAFA;
+  }
+
+  .barcode-img {
+    height: 120px;
+    filter: contrast(1.2);
+  }
+
+  .scan-info {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #666;
+  }
+
+  @media (max-width: 600px) {
+    .command-bar { grid-template-columns: 1fr 1fr; }
+    .tech-table th { width: 40%; }
+  }
+</style>
+
+<div id="industrial-wrapper">
+  <div class="master-panel">
+    
+    <header class="panel-header">
+      <h1>OBJECT_DATASHEET_v4.0</h1>
+      <div class="sys-id">LIVE_SYNC_STABLE</div>
+    </header>
+
+    <nav class="command-bar">
+      <a href="{% url 'manufacturer_list' %}" class="cmd-btn">← BACK</a>
+      <button id="dl-pdf" class="cmd-btn">EXP_PDF</button>
+      <a href="{% url 'edit' manufacturer.pk %}" class="cmd-btn">MODIFY</a>
+      <a href="{% url 'delete' manufacturer.pk %}" class="cmd-btn danger">PURGE</a>
+      <a href="{% url 'scan' %}" class="cmd-btn">SCANNER</a>
+    </nav>
+
+    <main class="datasheet-content" id="capture-area">
+      <div class="product-title-area">
+        <span>NOMENCLATURE:</span>
+        <h2>{{ manufacturer.item }}</h2>
+      </div>
+
+      <table class="tech-table">
         <tr>
-          <th>Item/Product</th>
-          <td>{{ manufacturer.item }}</td>
+          <th>INTERNAL_SKU</th>
+          <td style="font-weight: 700; color: var(--blue);">{{ manufacturer.sku }}</td>
         </tr>
         <tr>
-          <th>Quantity</th>
-          <td>{{ manufacturer.quantity }}</td>
+          <th>TOTAL_STOCK</th>
+          <td>{{ manufacturer.quantity }} UNITS</td>
         </tr>
         <tr>
-          <th>Date of Production</th>
-          <td>{{ manufacturer.date_of_production }}</td>
+          <th>PROD_DATE</th>
+          <td>{{ manufacturer.date_of_production|default:"-- : -- : --" }}</td>
         </tr>
         <tr>
-          <th>SKU</th>
-          <td>{{ manufacturer.sku }}</td>
+          <th>STORAGE_ZONE</th>
+          <td>{{ manufacturer.location|upper }}</td>
         </tr>
         <tr>
-          <th>Location</th>
-          <td>{{ manufacturer.location }}</td>
-        </tr>
-        <tr>
-          <th>Barcode</th>
-          <td><img src="{% url 'product_qr' manufacturer.pk %}" alt="{{ manufacturer.sku }}"</td>
+          <th>LEDGER_ENTRY</th>
+          <td>{{ manufacturer.date_added|date:"Y-m-d H:i" }}</td>
         </tr>
       </table>
-    </div>
+
+      <div class="asset-container">
+        <img src="{% url 'product_qr' manufacturer.pk %}" class="barcode-img" alt="BARCODE">
+        <div class="scan-info">
+          <strong>ASSET_SIGNATURE_VERIFIED</strong><br>
+          ENCODING: QR_CODE_v2<br>
+          <span style="color: var(--blue)">{{ manufacturer.sku }}</span>
+        </div>
+      </div>
+    </main>
+
   </div>
 </div>
 
-
+<script>
+  // HIGH-PRECISION PDF EXPORT
+  document.getElementById("dl-pdf").addEventListener("click", () => {
+    const element = document.getElementById("capture-area");
+    const opt = {
+      margin: 0.5,
+      filename: 'SPEC_{{ manufacturer.sku }}.pdf',
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: { scale: 3 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  });
+</script>
 
 {% endblock content %}

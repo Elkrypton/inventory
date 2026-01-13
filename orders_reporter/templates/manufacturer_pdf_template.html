@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ manufacturer.item }} - Details</title>
+    <style>
+        body { font-family: "DejaVu Sans", sans-serif; margin: 20px; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th { background-color: #f1f1f1; }
+    </style>
+</head>
+<body>
+    <h1>Product Details</h1>
+    <table>
+        <tr><th>Item/Product</th><td>{{ manufacturer.item }}</td></tr>
+        <tr><th>Quantity</th><td>{{ manufacturer.quantity }}</td></tr>
+        <tr><th>Date of Production</th><td>{{ manufacturer.date_of_production }}</td></tr>
+        <tr><th>SKU</th><td>{{ manufacturer.sku }}</td></tr>
+        <tr><th>Location</th><td>{{ manufacturer.location }}</td></tr>
+        <tr><th>Barcode</th>
+            <td><img src="{{ request.build_absolute_uri }}{% url 'product_qr' manufacturer.pk %}" alt="barcode"></td>
+        </tr>
+    </table>
+</body>
+</html>

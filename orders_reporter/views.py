@@ -1,4 +1,7 @@
 from .modules import *
+from django.template.loader import render_to_string
+
+
 from .models import Manufacturer
 from rest_framework import generics, viewsets
 from .serializers import *
@@ -78,7 +81,7 @@ class GeneratePDF(View):
     def get(self, request, *args, **kwargs):
         """Handle GET request for PDF generation."""
         template = get_template('manufacturer_detail.html')
-        manufacturer = get_object_or_404(Manufacturer, pk=kwargs['pk'])
+        manufacturer = Manufacturer.objects.filter(owner=request.user, pk=kwargs['pk'])
         context = {'manufacturer': manufacturer}
         pdf = render_to_pdf('manufacturer_detail.html', context)
         if pdf:
@@ -111,6 +114,25 @@ def product_search(request):
         form = SearchForm()
         results = []
     return render(request, 'search.html', {'form': form, 'results': results})
+
+###New PDF Generation Functionality
+from django.http import HttpResponse
+from django.template.loader import get_template
+
+
+def manufacturer_pdf(request, pk):
+    manufacturer = Manufacturer.objects.get(pk=pk)
+    template = get_template("manufacturer_pdf_template.html")
+    html = template.render({"manufacturer": manufacturer, "request": request})
+
+    response = HttpResponse(content_type="application/pdf")
+    filename = f"{manufacturer.item}_details.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF", status=500)
+    return response
 
 
 @login_required
@@ -189,16 +211,7 @@ def index(request):
         'total_quantity': total_quantity,
         'recent_items': recent_items,
     })
-@login_required
-def render_to_pdf(template_src, context_dict={}):
-    """Render a template to a PDF."""
-    template = get_template(template_src)
-    html = template.render(context_dict)
-    result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
-    if not pdf.err:
-        return HttpResponse(result.getvalue(), content_type='application/pdf')
-    return None
+
 
 @login_required
 def my_form_view(request):

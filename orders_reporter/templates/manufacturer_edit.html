@@ -1,197 +1,256 @@
-<!DOCTYPE html>
-
 {% extends "base.html" %}
 {% block content %}
-{% csrf_token %}
-
-
 <style>
-  /* Scoped styles for the forms page */
+  /* INDUSTRIAL LIGHT: GOD MODE OVERRIDE */
+  :root {
+    --ios-blue: #007AFF;
+    --industrial-gray: #1C1C1E;
+    --technical-bg: #F2F2F7;
+    --panel-bg: #FFFFFF;
+    --border-stroke: #D1D1D6;
+    --status-modify: #5856D6; /* Modify Purple */
+    --mono-font: 'JetBrains Mono', 'Menlo', monospace;
+  }
+
   body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
+    background-color: var(--technical-bg);
+    color: var(--industrial-gray);
+    font-family: 'Inter', -apple-system, sans-serif;
   }
 
-  .form-container {
-    max-width: 700px;
-    margin: 60px auto;
-    background-color: white;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-    animation: fadeIn 0.8s ease-out;
+  /* SYSTEM FRAME */
+  .system-deck {
+    max-width: 900px;
+    margin: 40px auto;
+    background: var(--panel-bg);
+    border: 2px solid var(--industrial-gray);
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.05);
+    position: relative;
+    animation: slideIn 0.4s ease-out;
   }
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  @keyframes slideIn {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
   }
 
-  .form-container h2 {
-    text-align: center;
-    font-size: 32px;
-    color: #333;
-    font-weight: 700;
-    margin-bottom: 20px;
-  }
-
-  .form-container form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .form-group label {
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 8px;
-    font-size: 15px;
-  }
-
-  .form-group input[type="text"],
-  .form-group input[type="number"],
-  .form-group input[type="date"],
-  .form-group select {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 15px;
-    background-color: #fefefe;
-    transition: all 0.3s ease;
-  }
-
-  .form-group input[type="text"]:focus,
-  .form-group input[type="number"]:focus,
-  .form-group input[type="date"]:focus,
-  .form-group select:focus {
-    border-color: #007bff;
-    background-color: #f3faff;
-    outline: none;
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
-  }
-
-  .btn-submit {
-    padding: 14px;
-    font-size: 16px;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    background-color: #007bff;
+  /* TOP CONTROL BAR */
+  .control-bar {
+    background: var(--status-modify); /* Purple indicates Edit Mode */
     color: white;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.3s ease;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono-font);
+    font-size: 11px;
+    text-transform: uppercase;
   }
 
-  .btn-submit:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  /* NAVIGATION PATH */
+  .bread-crumb {
+    padding: 15px 40px;
+    border-bottom: 1px solid var(--border-stroke);
+    font-family: var(--mono-font);
+    font-size: 10px;
+    color: #8E8E93;
+    background: #FAFAFA;
   }
 
-  .generated-sku {
+  /* FORM ARCHITECTURE */
+  .entry-form {
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 25px;
+  }
+
+  .span-6 { grid-column: span 6; }
+  .span-3 { grid-column: span 3; }
+
+  .data-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .data-block label {
+    font-family: var(--mono-font);
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--industrial-gray);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+  }
+
+  .data-block label::before {
+    content: ">>";
+    margin-right: 5px;
+    color: var(--status-modify);
+  }
+
+  /* INPUT PRECISION */
+  .data-block input, 
+  .data-block select {
+    background: #FFFFFF;
+    border: 1.5px solid var(--border-stroke);
+    padding: 12px;
+    color: var(--industrial-gray);
+    font-family: var(--mono-font);
     font-size: 14px;
-    font-weight: bold;
-    color: #28a745;
-    margin-top: 8px;
+    border-radius: 0;
+    transition: all 0.1s;
   }
 
-  /* Responsive Styling */
-  @media (max-width: 600px) {
-    .form-container {
-      padding: 20px;
-    }
+  /* Styling for File Upload */
+  .data-block input[type="file"] {
+    background: #FAFAFA;
+    font-size: 12px;
+    border: 1.5px dashed var(--border-stroke);
+  }
 
-    .form-container h2 {
-      font-size: 28px;
-    }
+  .data-block input:focus {
+    outline: none;
+    border-color: var(--industrial-gray);
+    box-shadow: 4px 4px 0px var(--status-modify);
+  }
+
+  /* SKU LOGIC DECK */
+  .sku-deck {
+    background: #F2F2F7;
+    border: 1px solid var(--border-stroke);
+    padding: 20px;
+  }
+
+  .monitor-feed {
+    margin-top: 15px;
+    padding: 12px;
+    background: var(--industrial-gray);
+    color: #FFF;
+    font-family: var(--mono-font);
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  /* COMMIT BUTTON */
+  .btn-commit {
+    grid-column: span 6;
+    background: var(--status-modify);
+    color: white;
+    padding: 20px;
+    font-family: var(--mono-font);
+    font-weight: 900;
+    font-size: 14px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+    border-bottom: 5px solid #3a38a1;
+  }
+
+  .btn-commit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(88, 86, 214, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    .span-3 { grid-column: span 6; }
   }
 </style>
-<div class="form-container mt-5">
-  <h2>Add Product</h2>
-<form action="{% url 'edit' manufacturer.pk %}" method='post'>
-	{% csrf_token %}
 
+<div class="system-deck">
+  <div class="control-bar">
+    <div>MOD_DATA_RECORD // PK: {{ manufacturer.pk }}</div>
+    <div id="sys-clock">00:00:00</div>
+    <div>ACCESS: OVERRIDE_ENABLED</div>
+  </div>
+
+  <div class="bread-crumb">
+    DIRECTORY > INVENTORY_SYSTEM > EDIT_OBJECT_PROTOCOL
+  </div>
+
+  <form action="{% url 'edit' manufacturer.pk %}" method="post" enctype="multipart/form-data" class="entry-form">
     {% csrf_token %}
 
-    <div class="form-group">
-      <label for="item">Item:</label>
+    <div class="data-block span-6">
+      <label for="item">OBJECT_IDENTIFIER</label>
       {{ form.item }}
     </div>
 
-    <div class="form-group">
-      <label for="item_image">Item Image:</label>
+    <div class="data-block span-6">
+      <label for="product_img">VISUAL_ASSET_ATTACHMENT</label>
       {{ form.product_img }}
     </div>
 
-    <div class="form-group">
-      <label for="quantity">Quantity:</label>
+    <div class="data-block span-3">
+      <label for="quantity">VOL_UNIT_COUNT</label>
       {{ form.quantity }}
     </div>
 
-    <div class="form-group">
-      <label for="date_of_production">Date of Production:</label>
+    <div class="data-block span-3">
+      <label for="date_of_production">TIMESTAMP_REF</label>
       {{ form.date_of_production }}
     </div>
 
-    <div class="form-group">
-      <label for="sku">SKU:</label>
-      {{ form.sku }}
-      {{ form.sku_gen }}
-      <div id="generated-sku" class="generated-sku"></div>
+    <div class="data-block span-6">
+      <label for="sku">SERIAL_SKU_DATA</label>
+      <div class="sku-deck">
+        <div style="margin-bottom: 10px; font-size: 12px; font-weight: bold;">
+          {{ form.sku_gen }}
+        </div>
+        {{ form.sku }}
+        <div id="output-feed" class="monitor-feed">
+          AWAITING_REVALIDATION...
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="location">Location:</label>
+    <div class="data-block span-6">
+      <label for="location">STORAGE_SECTOR_COORDINATE</label>
       {{ form.location }}
     </div>
 
-    <button type="submit" id="btn_add" class="btn-submit">Submit</button>
+    <button type="submit" id="btn_add" class="btn-commit">
+      Push_Changes_To_Ledger [UPDATE]
+    </button>
   </form>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  function generateSKU() {
-    var randomSKU = Math.floor(Math.random() * 9000) + 1000 + '-' +
-                    Math.floor(Math.random() * 1000) + '-' +
-                    Math.floor(Math.random() * 10000);
-    return randomSKU;
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('sys-clock').innerText = now.toTimeString().split(' ')[0];
   }
+  setInterval(updateClock, 1000);
+  updateClock();
 
-  function updateSKUField() {
-    var skuGenRadio = document.querySelector('input[name="sku_gen"]:checked');
-    var skuField = document.getElementById('id_sku');
-    var generatedSKUElement = document.getElementById('generated-sku');
-    if (skuGenRadio && skuGenRadio.value === 'auto') {
-      var generatedSKU = generateSKU();
-      skuField.value = generatedSKU;
-      generatedSKUElement.textContent = 'Generated SKU: ' + generatedSKU;
+  document.addEventListener('DOMContentLoaded', function () {
+    const skuField = document.getElementById('id_sku');
+    const feed = document.getElementById('output-feed');
+    
+    function updateSKUProtocol() {
+      const mode = document.querySelector('input[name="sku_gen"]:checked');
+      if (mode && mode.value === 'auto') {
+        // Keeping original logic but styled
+        const id = Math.floor(Math.random() * 9000) + 1000 + '-' +
+                   Math.floor(Math.random() * 1000) + '-' +
+                   Math.floor(Math.random() * 10000);
+        skuField.value = id;
+        skuField.readOnly = true;
+        feed.innerHTML = `PROTOCOL: AUTO_GENERATE<br>NEW_ID: ${id}<br>STATUS: PENDING_UPDATE`;
+        feed.style.borderLeft = "4px solid var(--status-modify)";
+      } else {
+        skuField.readOnly = false;
+        feed.innerHTML = `PROTOCOL: MANUAL_OVERRIDE<br>MODE: FIELD_EDITABLE`;
+        feed.style.borderLeft = "4px solid #FF9500";
+      }
     }
-  }
 
-  var skuGenRadios = document.querySelectorAll('input[name="sku_gen"]');
-  skuGenRadios.forEach(function(radio) {
-    radio.addEventListener('change', updateSKUField);
+    const radios = document.querySelectorAll('input[name="sku_gen"]');
+    radios.forEach(r => r.addEventListener('change', updateSKUProtocol));
+    updateSKUProtocol();
   });
-
-  updateSKUField();
-});
 </script>
-
-
 {% endblock content %}
-
