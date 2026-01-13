@@ -1,11 +1,125 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
-{% bootstrap_css %}
 
 {% block content %}
-    <h3> Your feedback has been sent to me!</h3>
-    <h4>Thank you!</h4>
-    <br>
+<style>
+  /* INDUSTRIAL SUCCESS OVERRIDE */
+  #success-shell {
+    --green: #34C759; /* Industrial Success Green */
+    --dark: #121212;
+    --gray-bg: #F2F2F7;
+    --mono: 'JetBrains Mono', monospace;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 80px;
+    min-height: calc(100vh - 120px);
+    background-color: var(--gray-bg);
+  }
+
+  .success-card {
+    background: #FFF;
+    border: 3px solid var(--dark);
+    box-shadow: 12px 12px 0px rgba(52, 199, 89, 0.2); /* Green tint shadow */
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    position: relative;
+    padding: 0;
+  }
+
+  /* SYSTEM STATUS STRIP */
+  .status-strip {
+    background: var(--green);
+    color: white;
+    padding: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .success-body {
+    padding: 40px;
+  }
+
+  .success-icon {
+    font-size: 50px;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .success-body h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: var(--dark);
+  }
+
+  .success-body h4 {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: #8E8E93;
+    margin-bottom: 30px;
+  }
+
+  /* COMMAND LINK */
+  .return-link {
+    display: inline-block;
+    background: var(--dark);
+    color: white !important;
+    text-decoration: none !important;
+    padding: 15px 30px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    border: 2px solid var(--dark);
+  }
+
+  .return-link:hover {
+    background: transparent;
+    color: var(--dark) !important;
+  }
+
+  /* SCANLINE EFFECT (Subtle Detail) */
+  .success-card::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.03) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.01));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+  }
+</style>
+
+<div id="success-shell">
+  <div class="success-card">
+    <div class="status-strip">
+        Transmission_Verified // 200_OK
+    </div>
+
+    <div class="success-body">
+      <span class="success-icon">✅</span>
+      <h3>Data Ingested</h3>
+      <h4>Your feedback has been successfully routed to the system administrator.</h4>
+      
+      <div style="border-top: 1px dashed #DDD; margin: 25px 0;"></div>
+
+      <a href="{% url 'home' %}" class="return-link">
+        ← Return_to_Dashboard
+      </a>
+    </div>
+  </div>
 </div>
 
+<script>
+    // System cleanup protocol
+    console.log("SUCCESS_PAGE_RENDERED: UPLINK_CLOSED");
+</script>
 {% endblock content %}

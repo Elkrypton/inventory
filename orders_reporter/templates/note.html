@@ -1,119 +1,171 @@
-<!DOCTYPE html>
-
 {% extends 'base.html' %}
 {% block content %}
 {% load bootstrap3 %}
-<title>Feedback</title>
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
-</head>
 
 <style>
-  /* Global reset for the page */
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f4f7fc;
-    margin: 0;
-    padding: 0;
+  /* INDUSTRIAL FEEDBACK OVERRIDE */
+  #feedback-shell {
+    --blue: #0066FF;
+    --dark: #121212;
+    --gray-bg: #F2F2F7;
+    --border: #121212;
+    --mono: 'JetBrains Mono', monospace;
+    
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
+    align-items: flex-start;
+    padding-top: 60px;
+    min-height: calc(100vh - 80px);
+    background-color: var(--gray-bg);
   }
 
-  /* Container styles for the content */
-  .container {
-    background: white;
-    border-radius: 8px;
-    padding: 40px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  .terminal-box {
+    background: #FFF;
+    border: 3px solid var(--border);
+    box-shadow: 12px 12px 0px rgba(0,0,0,0.1);
     width: 100%;
-    max-width: 700px;
-    margin-top: 5px;
+    max-width: 650px;
+    position: relative;
+    animation: terminalBoot 0.3s ease-out;
+  }
+
+  @keyframes terminalBoot {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* HEADER */
+  .terminal-header {
+    background: var(--dark);
+    color: #FFF;
+    padding: 12px 20px;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  h1 {
-    font-size: 28px;
-    font-weight: 600;
-    color: #333;
-    text-align: center;
+  .terminal-header h1 {
+    font-family: var(--mono);
+    font-size: 12px;
+    margin: 0;
+    letter-spacing: 2px;
+    font-weight: 700;
   }
 
-  /* Textarea styling */
-  textarea {
-    width: 100%;
-    height: 150px;
-    padding: 15px;
-    box-sizing: border-box;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    background-color: #f8f8f8;
-    font-size: 16px;
+  .sys-status {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--blue);
+  }
+
+  /* FORM AREA */
+  .terminal-body {
+    padding: 40px;
+  }
+
+  .protocol-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: #8E8E93;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  /* AGGRESSIVE INPUT OVERRIDE */
+  .terminal-body textarea, 
+  .terminal-body input {
+    width: 100% !important;
+    background: #FAFAFA !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 0 !important;
+    padding: 15px !important;
+    font-family: var(--mono) !important;
+    font-size: 14px !important;
+    transition: all 0.2s;
     resize: none;
-    transition: all 0.3s ease;
   }
 
-  textarea:focus {
-    border-color: #1974D2;
-    background-color: #fff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+  .terminal-body textarea:focus {
+    background: #FFF !important;
+    outline: none !important;
+    box-shadow: 4px 4px 0px var(--blue) !important;
   }
 
-  /* Button styling */
-  .button1 {
-    padding: 12px 30px;
-    background-color: #1974D2;
+  /* BUTTON */
+  .btn-execute {
+    width: 100%;
+    background: var(--blue);
     color: white;
-    font-size: 16px;
-    font-weight: 500;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-    border: none;
+    border: 2px solid var(--border);
+    padding: 18px;
+    font-family: var(--mono);
+    font-weight: 900;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 20px;
+    transition: all 0.2s;
   }
 
-  .button1:hover {
-    background-color: #155a8a;
-    transform: scale(1.05);
+  .btn-execute:hover {
+    background: var(--dark);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0px var(--blue);
   }
 
-  /* Mobile responsiveness */
+  /* DJANGO FORM STYLING HELPERS */
+  .form-group p {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+  }
+
   @media (max-width: 768px) {
-    .container {
-      padding: 20px;
-    }
-
-    textarea {
-      height: 120px;
-    }
-
-    .button1 {
-      width: 100%;
-    }
+    #feedback-shell { padding: 20px; }
   }
-
 </style>
 
-<body>
-  <div class="container">
-    <h1>Send Feedback</h1>
-    <form method="post">
-      <div class="form-group">
-        {{ feedback.as_p }}
+<div id="feedback-shell">
+  <div class="terminal-box">
+    <div class="terminal-header">
+      <h1>COMM_PROTOCOL_092</h1>
+      <div class="sys-status">CHANNEL: UPLINK_ENCRYPTED</div>
+    </div>
+
+    <div class="terminal-body">
+      <span class="protocol-label">>> INITIATING_USER_FEEDBACK_SEQ...</span>
+      
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          {{ feedback.as_p }}
+        </div>
+        
+        <button type="submit" class="btn-execute">
+          EXECUTE_TRANSMISSION [SEND]
+        </button>
+      </form>
+
+      <div style="margin-top: 30px; border-top: 1px solid #EEE; padding-top: 15px;">
+        <p style="font-family: var(--mono); font-size: 9px; color: #BBB; line-height: 1.5;">
+          NOTICE: Submitting this form logs your SYSTEM_ID and TIMESTAMP. 
+          Feedback is routed directly to the CORE_ADMINISTRATOR.
+        </p>
       </div>
-      {% csrf_token %}
-      <button type="submit" class="button1">Send</button>
-    </form>
+    </div>
   </div>
-</body>
+</div>
+
+<script>
+  // Simple interaction log
+  console.log("FEEDBACK_TERMINAL_READY");
+</script>
 
 {% endblock content %}
