@@ -1,6 +1,3 @@
-Here is the cleaned list of packages with all version numbers and the double equals signs removed.
-
-Cleaned Package List
 aiohappyeyeballs
 
 aiohttp
